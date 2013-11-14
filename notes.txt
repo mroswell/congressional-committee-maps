@@ -1,0 +1,6 @@
+1. Develop markup structure for map
+2. setup WebStorm to use chrome browser
+3. rename json file to .js to enable variable creation
+4. install
+5. clean up unwanted files
+6. commit to git

@@ -1,0 +1,21 @@
+{
+  "name": "congressional-committees",
+  "version": "0.0.0",
+  "authors": [
+    "Margie Roswell <mroswell@gmail.com>"
+  ],
+  "description": "Congressional Committee Maps",
+  "main": "index.html",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.0.3"
+  }
+}
