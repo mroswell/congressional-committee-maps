@@ -167,27 +167,43 @@ var stateName2Abbrev = {"Alabama":"AL","Alaska":"AK","Arizona":"AZ","Arkansas":"
 </footer>
 
 <script>
+
+
+
     var latitude = 39.9;
     var longitude = -98.5;
     var latLng = new L.LatLng(latitude, longitude);
     var map = L.map('map').setView(latLng, 4);
 //    var marker = L.marker(latLng).addTo(map);
 L.geoJson(statesMap).addTo(map);
-L.geoJson(congressionalMap).addTo(map);
 
-    L.tileLayer('http://{s}.tile.cloudmade.com/4733d063f9704b1c940a64459b1263e9/96931/256/{z}/{x}/{y}.png', {
-        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
-        maxZoom: 18
-    }).addTo(map);
 
-    $(".you-are-here").on("click", function() {
-        var setPosition = function(geo) {
-            var latlng = new L.LatLng(geo.coords.latitude, geo.coords.longitude);
-            var you = new L.marker(latlng).addTo(map);
-            map.setView(latlng, 16);
-        };
-        navigator.geolocation.getCurrentPosition(setPosition);
-    });
+L.tileLayer('http://{s}.tile.cloudmade.com/4733d063f9704b1c940a64459b1263e9/96931/256/{z}/{x}/{y}.png', {
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+    maxZoom: 18
+}).addTo(map);
+
+$(".you-are-here").on("click", function() {
+    var setPosition = function(geo) {
+        var latlng = new L.LatLng(geo.coords.latitude, geo.coords.longitude);
+        var you = new L.marker(latlng).addTo(map);
+        map.setView(latlng, 16);
+    };
+    navigator.geolocation.getCurrentPosition(setPosition);
+});
+
+var drawDistricts = function(responseData) {
+    L.geoJson(congressionalMap).addTo(map);
+}
+
+var agTestRequest = $.ajax({
+    dataType: "json",
+    url: "http://congress.api.sunlightfoundation.com/committees?per_page=all&chamber=house&committee_id=HSAG&subcommittee=false&fields=name,committee_id,office,subcommittee,phone,url,member_ids,members&apikey=9e3e71730ae34e1ebbf4dd0e1c346c07"}).done(function(responseData){
+
+    //handling of your json data
+    console.log("done")
+    drawDistricts(responseData)
+});
 
 </script>
 <!-- https://github.com/angular/angular.js/issues/4557 -->
