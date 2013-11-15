@@ -54,28 +54,95 @@ var statesToFips = {
 }
 
 
-
+// create variable called committeeRequest that asks Congress API for the members of the
+// House Agriculture Committee
 var committeeRequest = $.ajax({
     dataType: "json",
-    url: "http://congress.api.sunlightfoundation.com/committees?per_page=all&chamber=house&committee_id=HSAG&subcommittee=false&fields=name,committee_id,office,subcommittee,phone,url,member_ids,members&apikey=9e3e71730ae34e1ebbf4dd0e1c346c07"})
+    url: "http://congress.api.sunlightfoundation.com/committees?per_page=all&chamber=house&committee_id=HSAG&subcommittee=false&fields=name,committee_id,office,subcommittee,phone,url,members&apikey=9e3e71730ae34e1ebbf4dd0e1c346c07"})
+    //when this request is done, run an anonymous function that takes the committee...
   .done(function(committee){
-
   var parseCongressionalCommitteeResponse = function (congressionalCommittee) {
+      // create array that will be populated with state names
 	var arrayOfStateNamesForThisCommittee = [];
-	console.log(congressionalCommittee)
+      // log the congressionalCommittee
+	console.log(congressionalCommittee);
 		_.each(congressionalCommittee.results[0].members, function(data, index){ 
 			arrayOfStateNamesForThisCommittee.push(data.legislator.state_name);
 		})
 		return arrayOfStateNamesForThisCommittee;
 	}
-	var parsedCommitteeStatesArray = parseCongressionalCommitteeResponse(committee)
+    // determine FIPS Code from state name from the results array of parseCongressionalCommitteeResponse
+	var parsedCommitteeStatesArray = parseCongressionalCommitteeResponse(committee);
 	window.APP.changeThisVariableCommitteeData = _.map(parsedCommitteeStatesArray, function(statename){
-		var stateNumber = statesToFips[statename]
-		return stateNumber; 
+		var stateNumber = statesToFips[statename];
+		return stateNumber;
 	})
 });
 
 
+
+// +++++++++++
+// create variable called committeeRequest that asks Congress API for the members of the
+// House Agriculture Committee
+var committeeRequest = $.ajax({
+    dataType: "json",
+    url: "http://congress.api.sunlightfoundation.com/committees?per_page=all&chamber=house&committee_id=HSAG&subcommittee=false&fields=name,committee_id,office,subcommittee,phone,url,members&apikey=9e3e71730ae34e1ebbf4dd0e1c346c07"})
+
+
+
+
+
+// +++++++++++
+// create variable called committeeRequest that asks Congress API for the members of the
+// House Agriculture Committee, and log "done."
+var committeeRequest = $.ajax({
+    dataType: "json",
+    url: "http://congress.api.sunlightfoundation.com/committees?per_page=all&chamber=house&committee_id=HSAG&subcommittee=false&fields=name,committee_id,office,subcommittee,phone,url,members&apikey=9e3e71730ae34e1ebbf4dd0e1c346c07"}).done(function(committee){ console.log("done")});
+
+
+        var parseCongressionalCommitteeResponse = function (congressionalCommittee) {
+            // create array that will be populated with state names
+            var arrayOfStateNamesForThisCommittee = [];
+
+            _.each(congressionalCommittee.results[0].members, function(data, index){
+                arrayOfStateNamesForThisCommittee.push(data.legislator.state_name);
+            })
+            return arrayOfStateNamesForThisCommittee;
+        };
+        console.log(arrayOfStateNamesForThisCommittee);
+        // determine FIPS Code from state name from the results array of parseCongressionalCommitteeResponse
+        var parsedCommitteeStatesArray = parseCongressionalCommitteeResponse(committee);
+    });
+
+
+
+
+
+
+
+
+// create variable called committeeRequest that asks Congress API for the members of the
+// House Agriculture Committee
+var committeeRequest = $.ajax({
+    dataType: "json",
+    url: "http://congress.api.sunlightfoundation.com/committees?per_page=all&chamber=house&committee_id=HSAG&subcommittee=false&fields=name,committee_id,office,subcommittee,phone,url,members&apikey=9e3e71730ae34e1ebbf4dd0e1c346c07"})
+    //when this request is done, run an anonymous function that takes the committee...
+    .done(function(committee){
+        var parseCongressionalCommitteeResponse = function (congressionalCommittee) {
+            // create array that will be populated with state names
+            var arrayOfStateNamesForThisCommittee = [];
+            // print congressionalCommittee
+            console.log(congressionalCommittee); //why are these the same?
+            console.log(committee);              //why are these the same?
+            _.each(congressionalCommittee.results[0].members, function(data, index){
+                arrayOfStateNamesForThisCommittee.push(data.legislator.state_name);
+            })
+            return arrayOfStateNamesForThisCommittee;
+        }
+        console.log(arrayOfStateNamesForThisCommittee)
+        // determine FIPS Code from state name from the results array of parseCongressionalCommitteeResponse
+        var parsedCommitteeStatesArray = parseCongressionalCommitteeResponse(committee);
+    });
 
 
 

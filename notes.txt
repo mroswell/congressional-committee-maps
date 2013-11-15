@@ -4,3 +4,30 @@
 4. install
 5. clean up unwanted files
 6. commit to git
+
+
+
+<!--    <script>
+
+
+// list of committees
+// http://congress.api.sunlightfoundation.com/committees?per_page=all&apikey=9e3e71730ae34e1ebbf4dd0e1c346c07
+// list of house committees with detail
+// http://congress.api.sunlightfoundation.com/committees?per_page=all&apikey=9e3e71730ae34e1ebbf4dd0e1c346c07&chamber=house&subcommittee=false
+
+
+// particular committee detail
+//http://congress.api.sunlightfoundation.com/committees?per_page=all&chamber=house&committee_id=HSHM&subcommittee=false&fields=name,committee_id,office,subcommittee,phone,url,member_ids,members&apikey=9e3e71730ae34e1ebbf4dd0e1c346c07
+
+//legislator birthday
+//http://congress.api.sunlightfoundation.com/committees?per_page=all&chamber=house&committee_id=HSHM&subcommittee=false&fields=name,committee_id,office,subcommittee,phone,url,member_ids,members.legislator.birthday&apikey=9e3e71730ae34e1ebbf4dd0e1c346c07
+
+    var statesMap = $.ajax({
+    dataType: "json",
+    url: "http://congress.api.sunlightfoundation.com/committees?per_page=all&chamber=house&committee_id=HSHM&subcommittee=false&fields=name,committee_id,office,subcommittee,phone,url,member_ids,members&apikey=9e3e71730ae34e1ebbf4dd0e1c346c07"}).done(
+            function(result){
+                //handling of your json data
+                console.log("done")
+            });
+
+    </script>-->

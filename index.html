@@ -26,41 +26,11 @@
     <script src="js/vendor/custom.modernizr.js"></script>
     <script src="js/foundation/foundation.js"></script>
     <script src="js/foundation/foundation.dropdown.js"></script>
-<!--    <script>
-
-        // removed
-
-        var stateFips2Name = {"01":"Alabama","02":"Alaska","04":"Arizona","05":"Arkansas","06":"California","08":"Colorado","09":"Connecticut","10":"Delaware","11":"District of Columbia","12":"Florida","13":"Georgia","15":"Hawaii","16":"Idaho","17":"Illinois","18":"Indiana","19":"Iowa","20":"Kansas","21":"Kentucky","22":"Louisiana","23":"Maine","24":"Maryland","25":"Massachusetts","26":"Michigan","27":"Minnesota","28":"Mississippi","29":"Missouri","30":"Montana","31":"Nebraska","32":"Nevada","33":"New Hampshire","34":"New Jersey","35":"New Mexico","36":"New York","37":"North Carolina","38":"North Dakota","39":"Ohio","40":"Oklahoma","41":"Oregon","42":"Pennsylvania","44":"Rhode Island","45":"South Carolina","46":"South Dakota","47":"Tennessee","48":"Texas","49":"Utah","50":"Vermont","51":"Virginia","53":"Washington","54":"West Virginia","55":"Wisconsin","56":"Wyoming","72":"Puerto Rico"};
-
-var stateName2Abbrev = {"Alabama":"AL","Alaska":"AK","Arizona":"AZ","Arkansas":"AR","California":"CA","Colorado":"CO","Connecticut":"CT","Delaware":"DE","District of Columbia":"DC","Florida":"FL","Georgia":"GA","Hawaii":"HI","Idaho":"ID","Illinois":"IL","Indiana":"IN","Iowa":"IA","Kansas":"KS","Kentucky":"KY","Louisiana":"LA","Maine":"ME","Maryland":"MD","Massachusetts":"MA","Michigan":"MI","Minnesota":"MN","Mississippi":"MS","Missouri":"MO","Montana":"MT","Nebraska":"NE","Nevada":"NV","New Hampshire":"NH","New Jersey":"NJ","New Mexico":"NM","New York":"NY","North Carolina":"NC","North Dakota":"ND","Ohio":"OH","Oklahoma":"OK","Oregon":"OR","Pennsylvania":"PA","Puerto Rico":"PR","Rhode Island":"RI","South Carolina":"SC","South Dakota":"SD","Tennessee":"TN","Texas":"TX","Utah":"UT","Vermont":"VT","Virginia":"VA","Washington":"WA","West Virginia":"WV","Wisconsin":"WI","Wyoming":"WY"}
-
-// list of committees
-// http://congress.api.sunlightfoundation.com/committees?per_page=all&apikey=9e3e71730ae34e1ebbf4dd0e1c346c07
-// list of house committees with detail
-// http://congress.api.sunlightfoundation.com/committees?per_page=all&apikey=9e3e71730ae34e1ebbf4dd0e1c346c07&chamber=house&subcommittee=false
-
-
-// particular committee detail
-//http://congress.api.sunlightfoundation.com/committees?per_page=all&chamber=house&committee_id=HSHM&subcommittee=false&fields=name,committee_id,office,subcommittee,phone,url,member_ids,members&apikey=9e3e71730ae34e1ebbf4dd0e1c346c07
-
-//legislator birthday
-//http://congress.api.sunlightfoundation.com/committees?per_page=all&chamber=house&committee_id=HSHM&subcommittee=false&fields=name,committee_id,office,subcommittee,phone,url,member_ids,members.legislator.birthday&apikey=9e3e71730ae34e1ebbf4dd0e1c346c07
-
-    var statesMap = $.ajax({
-    dataType: "json",
-    url: "http://congress.api.sunlightfoundation.com/committees?per_page=all&chamber=house&committee_id=HSHM&subcommittee=false&fields=name,committee_id,office,subcommittee,phone,url,member_ids,members&apikey=9e3e71730ae34e1ebbf4dd0e1c346c07"}).done(
-            function(result){
-                //handling of your json data
-                console.log("done")
-            });
-
-    </script>-->
+    <script src="js/helperFunctions.js"></script>
 
 
 </head>
 <body>
-
-
 
 <script>
     $(document).foundation();
@@ -84,7 +54,7 @@ var stateName2Abbrev = {"Alabama":"AL","Alaska":"AK","Arizona":"AZ","Arkansas":"
 
 <div class="row">
 
-    <!-- Main Blog Content -->
+    <!-- Main Content -->
     <div class="large-9 columns" role="content">
 
         <article>
