@@ -1,3 +1,24 @@
+TODO
+1. populate three dropdown buttons
+   or refactor to use twitter Typeahead.js, and populate one input box.
+   http://twitter.github.io/typeahead.js/
+
+2. printed selected committee to the page
+3. Join the state name from API to state number from GeoJSON file
+4. Render map for selected committee
+5.   style map by party
+     for Senate, add stripes to represent color
+6. Populate committee member list in sidebar
+7. Populate click and member detail panel
+8. Close panel content, so that mouseovers function again to display content.
+9. Dropdown for subcommittees based on parent committee
+10. Subcommittee selection renders whole committee in lighter colors, and subcommittee members in darker colors.
+11. better districts (faster load time, but more detail in selected districts that are currently too generalized)
+12. Drag detail panel wherever the user wants it.
+
+
+DONE
+
 1. Develop markup structure for map
 2. setup WebStorm to use chrome browser
 3. rename json file to .js to enable variable creation
@@ -7,8 +28,8 @@
 
 
 
-<!--    <script>
-
+API call notes
+<--script>
 
 // list of committees
 // http://congress.api.sunlightfoundation.com/committees?per_page=all&apikey=9e3e71730ae34e1ebbf4dd0e1c346c07
