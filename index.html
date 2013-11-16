@@ -172,8 +172,7 @@
             .on("click", function () {
                 var setPosition = function (geo) {
                     var latlng = new L.LatLng(geo.coords.latitude, geo.coords.longitude);
-                    var you = new L.Marker(latlng)
-                            .addTo(map);
+
                     map.setView(latlng, 16);
                 };
                 navigator.geolocation.getCurrentPosition(setPosition);
@@ -182,15 +181,24 @@
     var drawDistricts = function (responseData) {
         L.geoJson(congressionalMap)
                 .addTo(map);
-    }
+    };
 
 
     var APP = {};
+
+    // +++++++++++
+    // create variable called committeeRequest that asks Congress API for the members of the
+    // House Agriculture Committee
+
     var committeeRequest = $.ajax({
         dataType: "json",
         url: "http://congress.api.sunlightfoundation.com/committees?per_page=all&chamber=house&committee_id=HSAG&subcommittee=false&fields=name,committee_id,office,subcommittee,phone,url,member_ids,members&apikey=9e3e71730ae34e1ebbf4dd0e1c346c07"})
             .done(function(committee){
+
+                //draw the congressional districts
                 drawDistricts(committee);
+
+
                 var parseCongressionalCommitteeResponse = function (congressionalCommittee) {
                     var arrayOfStateNamesForThisCommittee = [];
                     console.dir(congressionalCommittee);
@@ -198,7 +206,7 @@
                         arrayOfStateNamesForThisCommittee.push(data.legislator.state_name);
                     });
                     return arrayOfStateNamesForThisCommittee;
-                }
+                };
                 var parsedCommitteeStatesArray = parseCongressionalCommitteeResponse(committee);
                 console.log( parsedCommitteeStatesArray);
                 window.APP.changeThisVariableCommitteeData = _.map(parsedCommitteeStatesArray, function(statename){
