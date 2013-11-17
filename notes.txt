@@ -17,6 +17,13 @@ TODO
 12. Drag detail panel wherever the user wants it.
 
 
+
+- Convert startup and coloring code into reusable function code
+- button to make ajax request
+- function to process data, maps members to states, for now, and sets style
+
+
+
 DONE
 
 1. Develop markup structure for map

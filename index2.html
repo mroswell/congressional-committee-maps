@@ -5,11 +5,7 @@
     <title>Congressional Committee Maps</title>
     <script src="bower_components/jquery/jquery.js"></script>
     <script src="bower_components/underscore/underscore.js"></script>
-    <!--<script src="bower_components/backbone/backbone.js"></script>-->
-    <!--<script src="/js/main.js"></script>-->
-    <!--<script src="js/models/committeeList.js"></script>-->
-    <!--<script src="js/collections/users.js"></script>-->
-    <!--<script src="js/routers/router.js"></script>-->
+
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
     <!--[if lte IE 8]>
       <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
@@ -38,12 +34,7 @@
 </script>
 <div class="row">
     <div class="large-12 columns">
-        <!--<div class="nav-bar right">-->
-        <!--<ul class="button-group">-->
-        <!--<li><a href="#" class="button">About</a></li>-->
 
-        <!--</ul>-->
-        <!--</div>-->
         <h1><small>Congressional Committee Maps</small></h1>
     </div>
 </div>
@@ -92,7 +83,6 @@
             <div class="row">
 
                 <div class="large-12 columns" id="map">
-                    <!--<img src="http://placehold.it/960x600&text=[map]" />-->
                 </div>
             </div>
 
@@ -161,16 +151,7 @@
 
 
 
-    function getColor(d) {
-        return d > 1000 ? '#800026' :
-               d > 500 ? '#BD0026' :
-               d > 200 ? '#E31A1C' :
-               d > 100 ? '#FC4E2A' :
-               d > 50 ? '#FD8D3C' :
-               d > 20 ? '#FEB24C' :
-               d == 4 || d == 5 ? '#Ff0076' : // magenta, based on type conversion
-               '#FFEDA0';
-    }
+
 
     // My goal is to color by values from the API call. so far, only can color by properties already in the GeoJSON file
     function style(feature) {
@@ -186,8 +167,8 @@
         };
     }
 
-    L.geoJson(statesMap, {style: style})
-            .addTo(map);
+    var stateLayer = L.geoJson(statesMap);
+    stateLayer.addTo(map);
 
 
     L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png', {
@@ -205,49 +186,71 @@
     };
 
 
-    var APP = {};
-
-    // +++++++++++
     // create variable called committeeRequest that asks Congress API for the members of the
     // House Agriculture Committee
 
     var committeeRequest = $.ajax({
         dataType: "json",
-        url: "http://congress.api.sunlightfoundation.com/committees?per_page=all&chamber=house&committee_id=HSAG&subcommittee=false&fields=name,committee_id,office,subcommittee,phone,url,members&apikey=9e3e71730ae34e1ebbf4dd0e1c346c07"})
-            .done(function(committee){
-
-                // draw the congressional districts
-                // drawDistricts(committee);
-
-
-                var parseCongressionalCommitteeResponse = function (congressionalCommittee) {
-                    var arrayOfStateNamesForThisCommittee = [];
-                    console.dir(congressionalCommittee);
-                    _.each(congressionalCommittee.results[0].members, function(data, index){
-                        arrayOfStateNamesForThisCommittee.push(data.legislator.state_name);
-                    });
-                    return arrayOfStateNamesForThisCommittee;
+        url: "http://congress.api.sunlightfoundation.com/committees",
+        data: {
+            per_page: "all",
+            chamber: "senate",
+            committee_id: "SSAF",
+            subcommittee: false,
+            fields: ["name", "committee_id", "office", "subcommittee", "phone", "url", "members"],
+            apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
+        }
+    });
+    committeeRequest.done(function(committee){
+        var members = committee.results[0].members;
+        var states = {};
+        for (var i = 0; i < members.length; i++) {
+            var member = members[i].legislator;
+            var stateName = member.state_name;
+            if (!states[stateName]) {
+                states[stateName] = [ member ];
+            } else {
+                states[stateName].push(member);
+            }
+        }
+        stateLayer.setStyle(function(shape) {
+            var match = states[shape.properties.NAME];
+            if (!match) {
+                return {
+                    display: "none",
+                    opacity: 0,
+                    fillColor: "transparent"
                 };
-                var parsedCommitteeStatesArray = parseCongressionalCommitteeResponse(committee);
-                console.log( parsedCommitteeStatesArray);
-                window.APP.changeThisVariableCommitteeData = _.map(parsedCommitteeStatesArray, function(statename){
-                    var stateNumber = statesToFips[statename];
-                    return stateNumber;
-                });
+            }
+            var parties = _.map(match, function(member){
+                return member.party;
             });
+            var hasDem = parties.indexOf("D") > -1;
+            var hasRep = parties.indexOf("R") > -1;
+            var color;
+            if (hasDem && hasRep) {
+                color = "purple";
+            } else {
+                if (hasDem) {
+                    color = "blue";
+                } else {
+                    color = "red";
+                }
+            }
+            return {
+                fillColor: color,
+                weight: 2,
+                opacity: 1,
+                color: 'white',
+                dashArray: '3',
+                fillOpacity: 0.7
+            };
+        });
 
+    });
 
-//    statesMap.features = _.forEach(statesMap.features, function(state){
-//        _.extend(state.properties, {legislators: "aaaaa"} )
-//    })
-
-//    function getLegislators(state) {
-//        return _.map(congressionalCommittee.results[0].members, function (data) {return data.legislator})
-//                .where({"state_name": state})
-//    }
 
 </script>
-<!-- https://github.com/angular/angular.js/issues/4557 -->
 
 </body>
 
