@@ -8,7 +8,7 @@
 
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
     <!--[if lte IE 8]>
-      <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
     <![endif]-->
     <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
 
@@ -53,15 +53,30 @@
             <div class="large-12 columns">
                 <a href="#" class="button" data-dropdown="tinyDropHouse">House Committees &raquo;</a>
                 <ul id="tinyDropHouse" class="f-dropdown" data-dropdown-content="" style="position: absolute; top: 230px; left: -99999px;">
-                    <li><a href="javascript:void(0);" data-committee="HSAG">Agriculture</a>/li>
-
+                    <li><a href="javascript:void(0);" data-committee="HSAG">Agriculture</a></li>
                     <li><a href="javascript:void(0)" data-committee="HSAP">Appropriations</a></li>
-                    <li><a href="javascript:void(0);" data-committee="HSAG">Agriculture</a>/li>
+                    <li><a href="javascript:void(0);" data-committee="HSHM">House Committee on Homeland Security</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HLIG">House Permanent Select Committee on Intelligence</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HSSM">House Committee on Small Business</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HSBU">House Committee on the Budget</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HSWM">House Committee on Ways and Means</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HSVR">House Committee on Veterans' Affairs</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HSSY">House Committee on Science, Space, and Technology</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HSRU">House Committee on Rules</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HSPW">House Committee on Transportation and Infrastructure</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HSJU">House Committee on the Judiciary</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HSIF">House Committee on Energy and Commerce</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HSII">House Committee on Natural Resources</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HSHA">House Committee on House Administration</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HSGO">House Committee on Oversight and Government Reform</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HSFA">House Committee on Foreign Affairs</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HSED">House Committee on Education and the Workforce</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HSBA">House Committee on Financial Services</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HSAS">House Committee on Armed Services</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HSAP">House Committee on Appropriations</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HSAG">House Committee on Agriculture</a></li>
+                    <li><a href="javascript:void(0);" data-committee="HSSO">House Committee on Ethics</a></li>
 
-
-
-                    <li><a href="#">Yet another</a>
-                    </li>
                 </ul>
                 <a href="#" class="button" data-dropdown="tinyDropSenate">Senate Committees &raquo;</a>
                 <ul id="tinyDropSenate" class="f-dropdown" data-dropdown-content="" style="position: absolute; top: 230px; left: -99999px;">
@@ -94,12 +109,11 @@
                 </ul>
                 <a href="#" class="button" data-dropdown="tinyDropJoint">Joint Committees &raquo;</a>
                 <ul id="tinyDropJoint" class="f-dropdown" data-dropdown-content="" style="position: absolute; top: 230px; left: -99999px;">
-                    <li><a href="#">This is a link</a>
-                    </li>
-                    <li><a href="#">This is another</a>
-                    </li>
-                    <li><a href="#">Yet another</a>
-                    </li>
+                    <li><a href="javascript:void(0);" data-committee="JSTX">Joint Committee on Taxation</a></li>
+                    <li><a href="javascript:void(0);" data-committee="JSPR">Joint Committee on Printing</a></li>
+                    <li><a href="javascript:void(0);" data-committee="JSLC">Joint Committee on the Library</a></li>
+                    <li><a href="javascript:void(0);" data-committee="JSEC">Joint Economic Committee</a></li>
+                    <li><a href="javascript:void(0);" data-committee="JCSE">Commission on Security and Cooperation in Europe"</a></li>
                 </ul>
 
             </div>
@@ -213,73 +227,73 @@
     // House Agriculture Committee
 
     var drawMap= function (committee) {
-    var committeeRequest = $.ajax({
-        dataType: "json",
-        url: "http://congress.api.sunlightfoundation.com/committees",
-        data: {
-            per_page: "all",
-            //chamber: "house",
-            committee_id: committee,
-            subcommittee: false,
-            fields: ["name", "committee_id", "office", "subcommittee", "phone", "url", "members"],
-            apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
-        }
-    });
-    committeeRequest.done(function(committee){
-        var members = committee.results[0].members;
-        var states = {};
-        for (var i = 0; i < members.length; i++) {
-            var member = members[i].legislator;
-            var stateName = member.state+member.district;
-            if (!states[stateName]) {
-                states[stateName] = [ member ];
-            } else {
-                states[stateName].push(member);
+        var committeeRequest = $.ajax({
+            dataType: "json",
+            url: "http://congress.api.sunlightfoundation.com/committees",
+            data: {
+                per_page: "all",
+                //chamber: "house",
+                committee_id: committee,
+                subcommittee: false,
+                fields: ["name", "committee_id", "office", "subcommittee", "phone", "url", "members"],
+                apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
             }
-        }
-        console.log(states);
-        stateLayer.setStyle(function(shape) {
-            var abbreviation = stateName2Abbrev[stateFips2Name[shape.properties.STATE]];
-            var district = parseInt(shape.properties.CD, 10);
-            var match = states[abbreviation+district];
-            if (!match) {
-                return {
-                    display: "none",
-                    opacity: 0,
-                    fillColor: "transparent"
-                };
-            }
-            var parties = _.map(match, function(member){
-                return member.party;
-            });
-            var hasDem = parties.indexOf("D") > -1;
-            var hasRep = parties.indexOf("R") > -1;
-            var color;
-            if (hasDem && hasRep) {
-                color = "purple";
-            } else {
-                if (hasDem) {
-                    color = "blue";
+        });
+        committeeRequest.done(function(committee){
+            var members = committee.results[0].members;
+            var states = {};
+            for (var i = 0; i < members.length; i++) {
+                var member = members[i].legislator;
+                var stateName = member.state+member.district;
+                if (!states[stateName]) {
+                    states[stateName] = [ member ];
                 } else {
-                    color = "red";
+                    states[stateName].push(member);
                 }
             }
-            return {
-                fillColor: color,
-                weight: 2,
-                opacity: 1,
-                color: 'white',
-                dashArray: '3',
-                fillOpacity: 0.7
-            };
-        });
+            console.log(states);
+            stateLayer.setStyle(function(shape) {
+                var abbreviation = stateName2Abbrev[stateFips2Name[shape.properties.STATE]];
+                var district = parseInt(shape.properties.CD, 10);
+                var match = states[abbreviation+district];
+                if (!match) {
+                    return {
+                        display: "none",
+                        opacity: 0,
+                        fillColor: "transparent"
+                    };
+                }
+                var parties = _.map(match, function(member){
+                    return member.party;
+                });
+                var hasDem = parties.indexOf("D") > -1;
+                var hasRep = parties.indexOf("R") > -1;
+                var color;
+                if (hasDem && hasRep) {
+                    color = "purple";
+                } else {
+                    if (hasDem) {
+                        color = "blue";
+                    } else {
+                        color = "red";
+                    }
+                }
+                return {
+                    fillColor: color,
+                    weight: 2,
+                    opacity: 1,
+                    color: 'white',
+                    dashArray: '3',
+                    fillOpacity: 0.7
+                };
+            });
 
-    });
+        });
     }
     //drawMap('HSAG');
     $("[data-committee]").on("click", function(e) {
-       var committee = $(this).data("committee");
-       drawMap(committee);
+        var committee = $(this).data("committee");
+        drawMap(committee);
     });
 
 

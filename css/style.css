@@ -1,2 +1,10 @@
 .row {max-width:78em;}
 #map { height: 600px; }
+.f-dropdown {max-width: 420px;}
+.f-dropdown li {
+    font-size: 0.85em;
+    line-height: 1.1em;
+}
+.f-dropdown li a {
+    padding: 0.3em;
+}
