@@ -34,8 +34,9 @@
 </script>
 <div class="row">
     <div class="large-12 columns">
-
         <h1><small>Congressional Committee Maps</small></h1>
+        <div id="whichCommittee" style="display:block;"></div>
+
     </div>
 </div>
 
@@ -185,9 +186,22 @@
 
 
 
+    var stateLayer = L.geoJson(statesMap);
+    stateLayer.addTo(map).setStyle(function(shape)  {
+        return {
+            fillColor: 'white',
+            weight: 1,
+            opacity: .41,
+            color: 'grey',
+            dashArray: '3',
+            fillOpacity: 0.7
+        }
+    });
+    var congressLayer = L.geoJson(congressionalDistricts);
+    congressLayer.addTo(map);
 
-    var stateLayer = L.geoJson(congressionalDistricts);
-    stateLayer.addTo(map);
+
+
 
 
     L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png', {
@@ -220,24 +234,32 @@
                 fields: ["name", "committee_id", "office", "subcommittee", "phone", "url", "members"],
                 apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
             }
-        });
-        committeeRequest.done(function(committee){
+        }).done(function(committee){
             var members = committee.results[0].members;
             var states = {};
+            var districtName = {};
             for (var i = 0; i < members.length; i++) {
                 var member = members[i].legislator;
-                var stateName = member.state+member.district;
-                if (!states[stateName]) {
-                    states[stateName] = [ member ];
+                if (member.chamber==="house") {
+                  districtName = member.state+member.district;
+                    console.log(districtName);
                 } else {
-                    states[stateName].push(member);
+                  districtName = member.state;
+                    console.log(districtName);
+                }
+                if (!states[districtName]) {
+                    states[districtName] = [ member ];
+                } else {
+                    states[districtName].push(member);
                 }
             }
             console.log(states);
-            stateLayer.setStyle(function(shape) {
+            if (member.chamber==="house") {
+            congressLayer.setStyle(function(shape) {
                 var abbreviation = stateName2Abbrev[stateFips2Name[shape.properties.STATE]];
                 var district = parseInt(shape.properties.CD, 10);  //04 GeoJSON; 4 Congress API
                 var match = states[abbreviation+district];
+
                 if (!match) {
                     return {
                         display: "none",
@@ -268,13 +290,27 @@
                     dashArray: '3',
                     fillOpacity: 0.7
                 };
-            });
+            })
+            } else if (member.chamber==="senate") {
+                var match = states[shape.properties.NAME];
+
+            }
+
 
         });
     }
     //drawMap('HSAG');
     $("[data-committee]").on("click", function(e) {
+        console.log(this);
         var committee = $(this).data("committee");
+        $('#tinyDropSenate').on("click",function(){
+
+         $(this).hide();
+
+        });
+        $('#whichCommittee').empty();
+        var committeeName = $(this).text();
+        $('#whichCommittee').append(committeeName);
         drawMap(committee);
     });
 
