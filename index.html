@@ -182,7 +182,10 @@
     //    var marker = L.marker(latLng).addTo(map);
 
 
-    var stateLayer = L.geoJson(statesMap);
+    var stateLayer = L.geoJson(statesMap,
+            {onEachFeature: onEachFeature}
+
+    );
     stateLayer.addTo(map).setStyle(function(shape) {
         return {
             fillColor: 'white',
@@ -193,8 +196,22 @@
             fillOpacity: 0.7
         };
     });
-    var congressLayer = L.geoJson(congressionalDistricts);
-    congressLayer.addTo(map);
+    var congressLayer = L.geoJson(congressionalDistricts,
+            {
+                //style: {fillColor:'red'},
+                onEachFeature: onEachFeature
+            }
+    );
+    congressLayer.addTo(map).setStyle(function(shape) {
+        return {
+           // fillColor: '#F1EDE2',
+            weight: 1,
+            opacity: 0.41,
+            color: 'grey',
+            dashArray: '3',
+            fillOpacity: 0.7
+        };
+    });
 
 
 
@@ -344,6 +361,36 @@
             dashArray: '3',
             fillOpacity: 0.7
         };
+    }
+
+    function onEachFeature(feature, layer) {
+        layer.on({
+            mouseover: highlightFeature,
+            mouseout: resetHighlight
+            //click: zoomToFeature
+        });
+    }
+
+    function highlightFeature(e) {
+        var layer = e.target;
+
+        layer.setStyle({
+            weight: 3,
+            color: '#666',
+            dashArray: '',
+            fillOpacity: 0.7
+        });
+
+        if (!L.Browser.ie && !L.Browser.opera) {
+            layer.bringToFront();
+        }
+    }
+
+    function resetHighlight(e) {
+        console.log('RESET Function')
+        congressLayer.resetStyle(e.target);
+        stateLayer.resetStyle(e.target);
+
     }
 
 </script>
