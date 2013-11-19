@@ -52,8 +52,8 @@
 
         <section>
             <div class="large-12 columns">
-                <a href="#" class="button" data-dropdown="tinyDropHouse">House Committees &raquo;</a>
-                <ul id="tinyDropHouse" class="f-dropdown" data-dropdown-content="" style="position: absolute; top: 230px; left: -99999px;">
+                <a href="#" class="button committeeButton" data-dropdown="tinyDropHouse" data-options="is_hover:true">House Committees &raquo;</a>
+                <ul id="tinyDropHouse" class="f-dropdown" data-dropdown-content style="position: absolute; top: 230px; left: -99999px;">
                     <li><a href="javascript:void(0);" data-committee="HSAG">House Committee on Agriculture</a></li>
                     <li><a href="javascript:void(0);" data-committee="HSAP">House Committee on Appropriations</a></li>
                     <li><a href="javascript:void(0);" data-committee="HSAS">House Committee on Armed Services</a></li>
@@ -77,8 +77,8 @@
                     <li><a href="javascript:void(0);" data-committee="HLIG">House Permanent Select Committee on Intelligence</a></li>
 
                 </ul>
-                <a href="#" class="button" data-dropdown="tinyDropSenate">Senate Committees &raquo;</a>
-                <ul id="tinyDropSenate" class="f-dropdown" data-dropdown-content="" style="position: absolute; top: 230px; left: -99999px;">
+                <a href="#" class="button committeeButton" data-dropdown="tinyDropSenate" data-options="is_hover:true">Senate Committees &raquo;</a>
+                <ul id="tinyDropSenate" class="f-dropdown" data-dropdown-content style="position: absolute; top: 230px; left: -99999px;">
 
                     <li><a href="javascript:void(0);" data-committee="SSAF">Senate Committee on Agriculture, Nutrition, and Forestry</a></li>
                     <li><a href="javascript:void(0);" data-committee="SSAP">Senate Committee on Appropriations</a></li>
@@ -104,8 +104,8 @@
                     <li><a href="javascript:void(0);" data-committee="SCNC">United States Senate Caucus on International Narcotics Control</a></li>
 
                 </ul>
-                <a href="#" class="button" data-dropdown="tinyDropJoint">Joint Committees &raquo;</a>
-                <ul id="tinyDropJoint" class="f-dropdown" data-dropdown-content="" style="position: absolute; top: 230px; left: -99999px;">
+                <a href="#" class="button committeeButton" data-dropdown="tinyDropJoint"  data-options="is_hover:true">Joint Committees &raquo;</a>
+                <ul id="tinyDropJoint" class="f-dropdown" data-dropdown-content style="position: absolute; top: 230px; left: -99999px;">
                     <li><a href="javascript:void(0);" data-committee="JSTX">Joint Committee on Taxation</a></li>
                     <li><a href="javascript:void(0);" data-committee="JSPR">Joint Committee on Printing</a></li>
                     <li><a href="javascript:void(0);" data-committee="JSLC">Joint Committee on the Library</a></li>
@@ -241,6 +241,7 @@
             for (var i = 0; i < members.length; i++) {
                 var member = members[i].legislator;
                 if (member.chamber==="house") {
+                    console.log(member.chamber)
                   districtName = member.state+member.district;
                     console.log(districtName);
                 } else {
@@ -254,12 +255,14 @@
                 }
             }
             console.log(states);
+
+
             if (member.chamber==="house") {
             congressLayer.setStyle(function(shape) {
                 var abbreviation = stateName2Abbrev[stateFips2Name[shape.properties.STATE]];
                 var district = parseInt(shape.properties.CD, 10);  //04 GeoJSON; 4 Congress API
                 var match = states[abbreviation+district];
-
+console.log("match: " + match);
                 if (!match) {
                     return {
                         display: "none",
@@ -292,7 +295,43 @@
                 };
             })
             } else if (member.chamber==="senate") {
-                var match = states[shape.properties.NAME];
+                stateLayer.setStyle(function(shape) {
+                   // var abbreviation = stateName2Abbrev[stateFips2Name[shape.properties.STATE]];
+                   // var district = parseInt(shape.properties.CD, 10);  //04 GeoJSON; 4 Congress API
+                    //var match = states[abbreviation+district];
+                    var match = states[shape.properties.NAME];
+console.log('match: ' + match);
+                    if (!match) {
+                        return {
+                            display: "none",
+                            opacity: 0,
+                            fillColor: "transparent"
+                        };
+                    }
+                    var parties = _.map(match, function(member){
+                        return member.party;
+                    });
+                    var hasDem = parties.indexOf("D") > -1;
+                    var hasRep = parties.indexOf("R") > -1;
+                    var color;
+                    if (hasDem && hasRep) {
+                        color = "purple";
+                    } else {
+                        if (hasDem) {
+                            color = "blue";
+                        } else {
+                            color = "red";
+                        }
+                    }
+                    return {
+                        fillColor: color,
+                        weight: 1,
+                        opacity: 1,
+                        color: 'white',
+                        dashArray: '3',
+                        fillOpacity: 0.7
+                    };
+                })
 
             }
 
@@ -301,18 +340,20 @@
     }
     //drawMap('HSAG');
     $("[data-committee]").on("click", function(e) {
-        console.log(this);
+        console.log($(this));
         var committee = $(this).data("committee");
-        $('#tinyDropSenate').on("click",function(){
-
-         $(this).hide();
-
-        });
-        $('#whichCommittee').empty();
+        console.log("dropdown: ", $(this));
         var committeeName = $(this).text();
+        $('#whichCommittee').empty();
         $('#whichCommittee').append(committeeName);
+        console.log("parent", $(this).parent().parent());
+        $(this).parent().parent()
+                .css('left', '-99999px')
+                .removeClass("open");
         drawMap(committee);
     });
+    //$('.committeeButton').on("click",function(){
+
 
 
 </script>
