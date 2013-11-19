@@ -245,7 +245,7 @@
                   districtName = member.state+member.district;
                     console.log(districtName);
                 } else {
-                  districtName = member.state;
+                  districtName = member.state_name;
                     console.log(districtName);
                 }
                 if (!states[districtName]) {
@@ -262,91 +262,32 @@
                 var abbreviation = stateName2Abbrev[stateFips2Name[shape.properties.STATE]];
                 var district = parseInt(shape.properties.CD, 10);  //04 GeoJSON; 4 Congress API
                 var match = states[abbreviation+district];
-console.log("match: " + match);
-                if (!match) {
-                    return {
-                        display: "none",
-                        opacity: 0,
-                        fillColor: "transparent"
-                    };
-                }
-                var parties = _.map(match, function(member){
-                    return member.party;
-                });
-                var hasDem = parties.indexOf("D") > -1;
-                var hasRep = parties.indexOf("R") > -1;
-                var color;
-                if (hasDem && hasRep) {
-                    color = "purple";
-                } else {
-                    if (hasDem) {
-                        color = "blue";
-                    } else {
-                        color = "red";
-                    }
-                }
-                return {
-                    fillColor: color,
-                    weight: 1,
-                    opacity: 1,
-                    color: 'white',
-                    dashArray: '3',
-                    fillOpacity: 0.7
-                };
+                console.log("match: " , match);
+                return colorDistrict(match,'house');
             })
             } else if (member.chamber==="senate") {
+                
                 stateLayer.setStyle(function(shape) {
                    // var abbreviation = stateName2Abbrev[stateFips2Name[shape.properties.STATE]];
                    // var district = parseInt(shape.properties.CD, 10);  //04 GeoJSON; 4 Congress API
                     //var match = states[abbreviation+district];
                     var match = states[shape.properties.NAME];
-console.log('match: ' + match);
-                    if (!match) {
-                        return {
-                            display: "none",
-                            opacity: 0,
-                            fillColor: "transparent"
-                        };
-                    }
-                    var parties = _.map(match, function(member){
-                        return member.party;
-                    });
-                    var hasDem = parties.indexOf("D") > -1;
-                    var hasRep = parties.indexOf("R") > -1;
-                    var color;
-                    if (hasDem && hasRep) {
-                        color = "purple";
-                    } else {
-                        if (hasDem) {
-                            color = "blue";
-                        } else {
-                            color = "red";
-                        }
-                    }
-                    return {
-                        fillColor: color,
-                        weight: 1,
-                        opacity: 1,
-                        color: 'white',
-                        dashArray: '3',
-                        fillOpacity: 0.7
-                    };
+                    console.log('match: ' + match);
+                    return colorDistrict(match,'senate');
+
                 })
-
             }
-
-
         });
     }
     //drawMap('HSAG');
     $("[data-committee]").on("click", function(e) {
-        console.log($(this));
+        //console.log($(this));
         var committee = $(this).data("committee");
-        console.log("dropdown: ", $(this));
+        //console.log("dropdown: ", $(this));
         var committeeName = $(this).text();
         $('#whichCommittee').empty();
         $('#whichCommittee').append(committeeName);
-        console.log("parent", $(this).parent().parent());
+        //console.log("parent", $(this).parent().parent());
         $(this).parent().parent()
                 .css('left', '-99999px')
                 .removeClass("open");
@@ -354,7 +295,38 @@ console.log('match: ' + match);
     });
     //$('.committeeButton').on("click",function(){
 
-
+    function colorDistrict(committee, chamber) {
+    if (!committee) {
+        return {
+            display: "none",
+            opacity: 0,
+            fillColor: "transparent"
+        };
+    }
+    var parties = _.map(committee, function(member){
+        return member.party;
+    });
+    var hasDem = parties.indexOf("D") > -1;
+    var hasRep = parties.indexOf("R") > -1;
+    var color;
+    if (hasDem && hasRep) {
+        color = "purple";
+    } else {
+        if (hasDem) {
+            color = "blue";
+        } else {
+            color = "red";
+        }
+    }
+    return {
+        fillColor: color,
+        weight: 1,
+        opacity: 1,
+        color: 'white',
+        dashArray: '3',
+        fillOpacity: 0.7
+    };
+    }
 
 </script>
 
