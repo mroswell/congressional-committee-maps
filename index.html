@@ -6,7 +6,7 @@
     <script src="bower_components/jquery/jquery.js"></script>
     <script src="bower_components/underscore/underscore.js"></script>
     <script src="bower_components/handlebars/handlebars.min.js"></script>
-
+    <link href="bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
     <!--[if lte IE 8]>
@@ -19,19 +19,23 @@
 
     <!-- custom css -->
     <link rel="stylesheet" href="css/style.css" />
-
+    <!-- states, congressional districts, and helper functions-->
     <script src="maps/gz_2010_us_040_00_20m.js"></script>
     <script src="maps/cd_dists.js"></script>
+    <script src="js/helperFunctions.js"></script>
+
+
     <script src="js/vendor/custom.modernizr.js"></script>
     <script src="js/foundation/foundation.js"></script>
     <script src="js/foundation/foundation.dropdown.js"></script>
-    <script src="js/helperFunctions.js"></script>
     <script id="committee-member-template" type="text/x-handlebars-template">
 
         <div class="entry">
-            {{ committee_name}}
+            <a href="{{committee_results.url}}" target="_blank"><h6>{{ committee_name}} <i class="fa fa-link"></i></h6></a>
             <ul>
-                {{#each members1}}<li><a href="javascript:void(0);" data-committee="{{committee_abbrev}}">{{memberFirstName}} {{memberLastName}}{{#if title}}, {{title}}{{/if}}</a></li>{{/each}}
+                {{#each sorted_members}}
+                <li><a href="javascript:void(0);" data-committee="{{committee_abbrev}}">
+                    {{memberFirstName}} {{memberLastName}}{{#if title}}, {{title}}{{/if}}</a></li>{{/each}}
             </ul>
         </div>
     </script>
@@ -391,8 +395,8 @@
         var context = {
             committee_abbrev: committee.results[0].committee_id,
             committee_name: committee.results[0].name,
-            members: committee.results[0].members[0],
-            members1: sortedMemberNames,
+            committee_results: committee.results[0],
+            sorted_members: sortedMemberNames,
             first_name: committee.results[0].members[0].legislator.first_name,
             title: committee.results[0].members[0].title
 
