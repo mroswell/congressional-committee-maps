@@ -8,3 +8,29 @@
 .f-dropdown li a {
     padding: 0.3em;
 }
+
+
+
+#committee-list ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+
+#committee-list ul.column li.box2 {
+    -webkit-box-shadow: 0 1px 2px #777;
+    -moz-box-shadow: 0 2px 1px #777;
+    box-shadow: 0 2px 1px #777;
+}
+
+
+#committee-list li a {
+    text-decoration: none;
+    /*color: #000;*/
+
+}
+
+#committee-list li:hover {
+    background: #f6f6f6;
+}

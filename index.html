@@ -145,18 +145,7 @@
         </div>
         <div id="committee-list">
         <!--<h5>Committee Members</h5>-->
-        <!--<ul class="side-nav">-->
-            <!--<li><a href="#">Member 1</a>-->
-            <!--</li>-->
-            <!--<li><a href="#">Member 2</a>-->
-            <!--</li>-->
-            <!--<li><a href="#">Member 3</a>-->
-            <!--</li>-->
-            <!--<li><a href="#">Member 4</a>-->
-            <!--</li>-->
-            <!--<li><a href="#">Member 5</a>-->
-            <!--</li>-->
-        <!--</ul>-->
+
         </div>
 
 
@@ -295,7 +284,7 @@
                     }
                 });
 
-    }
+    };
 
     //drawMap('HSAG');
     $("[data-committee]").on("click", function(e) {
@@ -363,9 +352,9 @@
         var source = $("#committee-member-template")
                 .html();
         var template = Handlebars.compile(source);
-        console.log(committee.results[0].members);
-        console.log(committee.results[0].members[0].legislator);
-        console.log(committee.results[0].members[0].legislator.first_name);
+        // console.log(committee.results[0].members);
+        // console.log(committee.results[0].members[0].legislator);
+        // console.log(committee.results[0].members[0].legislator.first_name);
 
         //var parseCongressionalCommitteeResponse = function (congressionalCommittee) {
         // create array that will be populated with state names
@@ -394,7 +383,7 @@
         console.log(sortedMemberNames);
 
 
-        console.log("arrayOfCommitteeMembers", arrayOfCommitteeMembers);
+       // console.log("arrayOfCommitteeMembers", arrayOfCommitteeMembers);
         //return arrayOfStateNamesForThisCommittee;
         // };
 
@@ -407,11 +396,11 @@
             first_name: committee.results[0].members[0].legislator.first_name,
             title: committee.results[0].members[0].title
 
-        }
+        };
         var html = template(context);
         $('#committee-list')
-                .html(html)
-        console.log(committee)
+                .html(html);
+        console.log(committee);
     }
 </script>
 
