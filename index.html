@@ -35,7 +35,7 @@
             <ul>
                 {{#each sorted_members}}
                 <li><a href="javascript:void(0);" data-committee="{{committee_abbrev}}">
-                    {{memberFirstName}} {{memberLastName}}{{#if title}}, {{title}}{{/if}}</a></li>{{/each}}
+                    {{memberFirstName}} {{memberLastName}} ({{stateAbbreviation}}{{#if district}}-{{district}}{{/if}}){{#if title}}, {{title}}{{/if}}</a></li>{{/each}}
             </ul>
         </div>
     </script>
@@ -371,7 +371,9 @@
             var memberObject = {
                 memberFirstName: member.legislator.first_name,
                 memberLastName: member.legislator.last_name,
-                title: member.title
+                title: member.title,
+                stateAbbreviation: member.legislator.state,
+                district: member.legislator.district
             };
 
             if (memberObject.title) {
@@ -384,7 +386,7 @@
         var sortedArrayOfMemberChairs = _(arrayOfCommitteeChairs).sortBy("title");
 
         var sortedMemberNames = sortedArrayOfMemberChairs.concat(sortedArrayOfMemberNames);
-        console.log(sortedMemberNames);
+        console.log("sorted member names", sortedMemberNames);
 
 
        // console.log("arrayOfCommitteeMembers", arrayOfCommitteeMembers);
@@ -396,8 +398,10 @@
             committee_abbrev: committee.results[0].committee_id,
             committee_name: committee.results[0].name,
             committee_results: committee.results[0],
+            committee_members: committee.results[0].members[0].legislator,
             sorted_members: sortedMemberNames,
             first_name: committee.results[0].members[0].legislator.first_name,
+            //state: committee.results[0].members[0].legislator.state,
             title: committee.results[0].members[0].title
 
         };
