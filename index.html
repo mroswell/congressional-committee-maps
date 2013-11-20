@@ -34,7 +34,7 @@
             <a href="{{committee_results.url}}" target="_blank"><h6>{{ committee_name}} <i class="fa fa-link"></i></h6></a>
             <ul>
                 {{#each sorted_members}}
-                <li><a href="javascript:void(0);" data-committee="{{committee_abbrev}}">
+                <li><a href="javascript:void(0);" data-memberId="{{bioguideId}}">
                     {{memberFirstName}} {{memberLastName}} ({{stateAbbreviation}}{{#if district}}-{{district}}{{/if}}){{#if title}}, {{title}}{{/if}}</a></li>{{/each}}
             </ul>
         </div>
@@ -211,6 +211,7 @@
     var drawDistricts = function (responseData) {
         L.geoJson(congressionalDistricts).addTo(map);
     };
+    //console.log(committeeRequest.results[0].members[0].legislator.website);
 
     // create variable called committeeRequest that asks Congress API for the members of the
     // House Agriculture Committee
@@ -230,6 +231,7 @@
         }).done(function(committee){
                     listMembers(committee);
 
+                   // console.log(committee.results[0].members[3].legislator.website);
                     var members = committee.results[0].members;
                     var states = {};
                     var districtName = {};
@@ -373,7 +375,8 @@
                 memberLastName: member.legislator.last_name,
                 title: member.title,
                 stateAbbreviation: member.legislator.state,
-                district: member.legislator.district
+                district: member.legislator.district,
+                bioguideId: member.legislator.bioguide_id
             };
 
             if (memberObject.title) {
@@ -382,8 +385,8 @@
                 arrayOfCommitteeMembers.push(memberObject);
             }
         })
-        var sortedArrayOfMemberNames = _(arrayOfCommitteeMembers).sortBy("memberLastName");
         var sortedArrayOfMemberChairs = _(arrayOfCommitteeChairs).sortBy("title");
+        var sortedArrayOfMemberNames = _(arrayOfCommitteeMembers).sortBy("memberLastName");
 
         var sortedMemberNames = sortedArrayOfMemberChairs.concat(sortedArrayOfMemberNames);
         console.log("sorted member names", sortedMemberNames);
