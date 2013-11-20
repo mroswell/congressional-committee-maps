@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+<head>
+    <style>
+        #btn {
+            display: inline-block;
+            padding: 6px 12px;
+            margin-bottom: 0;
+            font-family: Helvetica, Arial, serif;
+            font-size: 14px;
+            font-weight: bolder;
+            line-height: 1.428571429;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            cursor: pointer;
+            background-image: none;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            color:#ffffff;
+        }
+    </style>
+</head>
+<body>
+<script src="bower_components/jquery/jquery.min.js"></script>
+<script src="bower_components/underscore/underscore-min.js"></script>
+<script src="bower_components/handlebars/handlebars.min.js"></script>
+<div id="btn" style="background-color: coral">Click for House Committees</div>
+
+<script id="committee-member-template" type="text/x-handlebars-template">
+
+    <div class="entry">
+        {{ committee_name}}
+
+
+<ul>
+            {{#each members1}}<li><a href="javascript:void(0);" data-committee="{{committee_abbrev}}">{{memberFirstName}} {{memberLastName}}{{#if title}}, {{title}}{{/if}}</a></li>{{/each}}
+</ul>
+    </div>
+</script>
+
+
+<script>
+    $("#btn")
+            .click(function () {
+                //alert('button clicked');
+                drawMap("HSAG")
+            });
+
+    var drawMap = function (committee) {
+        var committeeRequest = $.ajax({
+            dataType: "json",
+            url: "http://congress.api.sunlightfoundation.com/committees",
+            data: {
+                per_page: "all",
+                chamber: "house",
+                committee_id: committee,
+                subcommittee: false,
+                fields: ["name", "committee_id", "office", "subcommittee", "phone", "url", "members"],
+                apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
+            }
+        })
+                .done(function (committee) {
+
+                    console.log(committee.results[0].name);
+                    var source = $("#committee-member-template")
+                            .html();
+                    var template = Handlebars.compile(source);
+                    console.log(committee.results[0].members);
+                    console.log(committee.results[0].members[0].legislator);
+                    console.log(committee.results[0].members[0].legislator.first_name);
+
+                    //var parseCongressionalCommitteeResponse = function (congressionalCommittee) {
+                        // create array that will be populated with state names
+                        var arrayOfNamesForThisCommittee = [];
+                        var committeeNamesObj = {};
+
+                        _.each(committee.results[0].members, function(member, index){
+                            arrayOfNamesForThisCommittee.push({
+                                memberFirstName: member.legislator.first_name,
+                                memberLastName: member.legislator.last_name,
+                                title: member.title
+                            });
+                        })
+                    var sortedArrayOfMemberNames = _(arrayOfNamesForThisCommittee).sortBy("memberLastName");
+
+
+                        console.log("arrayOfNamesForThisCommittee", arrayOfNamesForThisCommittee);
+                        //return arrayOfStateNamesForThisCommittee;
+                   // };
+
+
+                    var context = {
+                        committee_abbrev: committee.results[0].committee_id,
+                        committee_name: committee.results[0].name,
+                        members: committee.results[0].members[0],
+                        members1: sortedArrayOfMemberNames ,
+                        first_name: committee.results[0].members[0].legislator.first_name,
+                        title: committee.results[0].members[0].title
+
+                    }
+                    var html = template(context);
+                    $('body')
+                            .append(html)
+                    console.log(committee)
+                });
+    }
+</script>
+</body>
+</html>
