@@ -31,11 +31,9 @@
 
     <div class="entry">
         {{ committee_name}}
-
-
-<ul>
+        <ul>
             {{#each members1}}<li><a href="javascript:void(0);" data-committee="{{committee_abbrev}}">{{memberFirstName}} {{memberLastName}}{{#if title}}, {{title}}{{/if}}</a></li>{{/each}}
-</ul>
+        </ul>
     </div>
 </script>
 
@@ -60,7 +58,7 @@
                 apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
             }
         })
-                .done(function (committee) {
+                .done(function listMembers(committee) {
 
                     console.log(committee.results[0].name);
                     var source = $("#committee-member-template")
@@ -71,30 +69,42 @@
                     console.log(committee.results[0].members[0].legislator.first_name);
 
                     //var parseCongressionalCommitteeResponse = function (congressionalCommittee) {
-                        // create array that will be populated with state names
-                        var arrayOfNamesForThisCommittee = [];
-                        var committeeNamesObj = {};
+                    // create array that will be populated with state names
+                    var arrayOfCommitteeChairs = [];
+                    var arrayOfCommitteeMembers = [];
 
-                        _.each(committee.results[0].members, function(member, index){
-                            arrayOfNamesForThisCommittee.push({
-                                memberFirstName: member.legislator.first_name,
-                                memberLastName: member.legislator.last_name,
-                                title: member.title
-                            });
-                        })
-                    var sortedArrayOfMemberNames = _(arrayOfNamesForThisCommittee).sortBy("memberLastName");
+                    var committeeNamesObj = {};
+
+                    _.each(committee.results[0].members, function(member, index){
+                        var memberObject = {
+                            memberFirstName: member.legislator.first_name,
+                            memberLastName: member.legislator.last_name,
+                            title: member.title
+                        };
+
+                        if (memberObject.title) {
+                            arrayOfCommitteeChairs.push(memberObject);
+                        } else {
+                            arrayOfCommitteeMembers.push(memberObject);
+                        }
+                    })
+                    var sortedArrayOfMemberNames = _(arrayOfCommitteeMembers).sortBy("memberLastName");
+                    var sortedArrayOfMemberChairs = _(arrayOfCommitteeChairs).sortBy("title");
+
+                    var sortedMemberNames = sortedArrayOfMemberChairs.concat(sortedArrayOfMemberNames);
+                    console.log(sortedMemberNames);
 
 
-                        console.log("arrayOfNamesForThisCommittee", arrayOfNamesForThisCommittee);
-                        //return arrayOfStateNamesForThisCommittee;
-                   // };
+                    console.log("arrayOfCommitteeMembers", arrayOfCommitteeMembers);
+                    //return arrayOfStateNamesForThisCommittee;
+                    // };
 
 
                     var context = {
                         committee_abbrev: committee.results[0].committee_id,
                         committee_name: committee.results[0].name,
                         members: committee.results[0].members[0],
-                        members1: sortedArrayOfMemberNames ,
+                        members1: sortedMemberNames,
                         first_name: committee.results[0].members[0].legislator.first_name,
                         title: committee.results[0].members[0].title
 
