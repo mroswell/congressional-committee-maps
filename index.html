@@ -44,7 +44,7 @@
         <div class="entry">
 
             <ul>
-                {{#each mDetail}}
+                {{#each memberDetail}}
                 <li><a href="javascript:void(0);">
                     {{memberFirstName}} {{memberLastName}}{{#if title}}, {{title}}{{/if}}</a></li>
                 {{/each}}
@@ -155,7 +155,7 @@
     <!-- Sidebar -->
 
     <aside class="large-3 columns">
-        <div class="panel" id=committee-detail">
+        <div class="panel" id="member-detail">
 
             <h5>Featured</h5>
             <p>Click a district or member for detail.</p>
@@ -484,8 +484,7 @@ function memberDetailFunction(memb, mDetail){
     console.log("templateDetail", templateDetail);
     var htmlDetail = templateDetail(mDetail);
     console.log("htmlDetail", htmlDetail);
-
-    console.log("htmlDetail from memberDetailFunction");
+    $('#member-detail').html(htmlDetail);
 }
 </script>
 
