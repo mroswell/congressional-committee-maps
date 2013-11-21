@@ -28,9 +28,14 @@
 #committee-list li a {
     text-decoration: none;
     /*color: #000;*/
-
 }
 
 #committee-list li:hover {
     background: #f6f6f6;
+}
+
+#entry-member-detail p {
+    font-size: 90%;
+    line-height: 1.3;
+    margin-bottom: 0;
 }

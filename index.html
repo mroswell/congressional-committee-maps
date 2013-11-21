@@ -42,11 +42,15 @@
     <script id="committee-member-detail-template" type="text/x-handlebars-template">
 
         <div class="entry" id="entry-member-detail">
-            <strong>{{memberFirstName}} {{memberLastName}} ({{party}}){{#if title}}, {{title}}{{/if}}</strong>
-
+            <p><strong>{{memberFirstName}} {{memberLastName}} ({{party}}){{#if title}}, {{title}}{{/if}}</strong>
+            <br />{{#unless district}}
+            {{state_name}}
+            {{else}}
+            District {{stateAbbreviation}}-{{district}}
+            {{/unless}}
             <br> {{office}} <br>{{phone}}
-            <br /><a target="_blank" href="http://facebook.com/profile.php?id={{facebook_id}}">Facebook</a> &bull; <a href="http://twitter.com/{{twitter_id}}" target="_blank">Twitter</a>
-
+            <br /><a target="_blank" href="{{website}}">Website</a> &bull; <a target="_blank" href="{{contact_form}}">Contact Form</a> &bull; <a target="_blank" href="http://facebook.com/profile.php?id={{facebook_id}}">Facebook</a> &bull; <a href="http://twitter.com/{{twitter_id}}" target="_blank">Twitter</a> &bull; <a href="http://www.opensecrets.org/politicians/summary.php?cid={{crp_id}}" target="_blank">Open Secrets</a>
+            </p>
         </div>
     </script>
 </head>
@@ -201,14 +205,23 @@
         return {
             fillColor: 'white',
             weight: 1,
-            opacity: 0.41,
-            color: 'grey',
-            dashArray: '3',
+            opacity: 0.21,
+            color: '#333333',
+            dashArray: '0',
             fillOpacity: 0.7
         };
     });
     var congressLayer = L.geoJson(congressionalDistricts);
-    congressLayer.addTo(map);
+    congressLayer.addTo(map).setStyle(function(shape){
+        return {
+            fillColor: 'white',
+            weight: 1,
+            opacity: 0.41,
+            color: '#D7D7D7',
+            dashArray: '0',
+            fillOpacity: 0
+    }
+    });
 
 
 
@@ -357,12 +370,12 @@
         var hasRep = parties.indexOf("R") > -1;
         var color;
         if (hasDem && hasRep) {
-            color = "purple";
+            color = "#84207C";//"#86307A";//"purple";
         } else {
             if (hasDem) {
-                color = "blue";
+                color = "blue";//"#0920d3";//"#1464C8";//"#2553A8";//"#0F2CB9";//"#0B22E3";//"#1B55B9";//"#1644C7";//"#2166AC";//"#4393C3";//"#2424FF"; //80% blue
             } else {
-                color = "red";
+                color = "red";//"#d30c09";//"#c81714";//"#F1100D";//"#DD2820";//"#D73027";//"#B2182B";//"red";
             }
         }
         return {
@@ -392,21 +405,26 @@
         var arrayOfCommitteeChairs = [];
         var arrayOfCommitteeMembers = [];
 
+        var re = /(Building)\s(Bldg)/
+
         _.each(committee.results[0].members, function(member, index){
             var memberObject = {
                 bioguide_id:        member.legislator.bioguide_id,
                 crp_id:             member.legislator.crp_id,
+                contact_form:       member.legislator.contact_form,
                 district:           member.legislator.district,
                 facebook_id:        member.legislator.facebook_id,
                 memberFirstName:    member.legislator.first_name,
                 memberLastName:     member.legislator.last_name,
-                office:             member.legislator.office,
+                office_orig:             member.legislator.office,
+                office:             member.legislator.office.replace("Building","Bldg."),
                 party:              member.legislator.party,
                 phone:              member.legislator.phone,
                 state_name:         member.legislator.state_name,
                 stateAbbreviation:  member.legislator.state,
                 title:              member.title,
-                twitter_id:         member.legislator.twitter_id
+                twitter_id:         member.legislator.twitter_id,
+                website:            member.legislator.website
             };
 
             if (memberObject.title) {

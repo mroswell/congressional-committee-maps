@@ -1,3 +1,9 @@
+Missing data that I want to add:
+- Actual contact form
+- influence explorer id
+
+
+
 
 1. retrieve data for a single member (bioguide_id) on a click event
 $('a').click( function(e.preventDefault() console.log(this.data("memberId");
