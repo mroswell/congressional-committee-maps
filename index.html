@@ -34,19 +34,19 @@
             <a href="{{committee_results.url}}" target="_blank"><h6>{{ committee_name}} <i class="fa fa-link"></i></h6></a>
             <ul>
                 {{#each sorted_members}}
-                <li><a href="javascript:void(0);" data-member-id="{{bioguideId}}">
+                <li><a href="javascript:void(0);" data-member-id="{{bioguide_id}}">
                     {{memberFirstName}} {{memberLastName}} ({{stateAbbreviation}}{{#if district}}-{{district}}{{/if}}){{#if title}}, {{title}}{{/if}}</a></li>{{/each}}
             </ul>
         </div>
     </script>
     <script id="committee-member-detail-template" type="text/x-handlebars-template">
 
-        <div class="entry">
+        <div class="entry" id="entry-member-detail">
+            <strong>{{memberFirstName}} {{memberLastName}} ({{party}}){{#if title}}, {{title}}{{/if}}</strong>
 
-            <ul>
-                <li><a href="javascript:void(0);">
-                    {{memberFirstName}} {{memberLastName}}{{#if title}}, {{title}}{{/if}}</a></li>
-            </ul>
+            <br> {{office}} <br>{{phone}}
+            <br /><a target="_blank" href="http://facebook.com/profile.php?id={{facebook_id}}">Facebook</a> &bull; <a href="http://twitter.com/{{twitter_id}}" target="_blank">Twitter</a>
+
         </div>
     </script>
 </head>
@@ -384,29 +384,29 @@
                 .html();
 
 
-
-
-
         var template = Handlebars.compile(source);
 
         // console.log(committee.results[0].members);
-        // console.log(committee.results[0].members[0].legislator);
-        // console.log(committee.results[0].members[0].legislator.first_name);
+
 
         var arrayOfCommitteeChairs = [];
         var arrayOfCommitteeMembers = [];
 
-        var committeeNamesObj = {};
-
         _.each(committee.results[0].members, function(member, index){
             var memberObject = {
-                memberFirstName: member.legislator.first_name,
-                memberLastName: member.legislator.last_name,
-                title: member.title,
-                stateAbbreviation: member.legislator.state,
-                district: member.legislator.district,
-                bioguideId: member.legislator.bioguide_id,
-                twitter: member.legislator.twitter_id
+                bioguide_id:        member.legislator.bioguide_id,
+                crp_id:             member.legislator.crp_id,
+                district:           member.legislator.district,
+                facebook_id:        member.legislator.facebook_id,
+                memberFirstName:    member.legislator.first_name,
+                memberLastName:     member.legislator.last_name,
+                office:             member.legislator.office,
+                party:              member.legislator.party,
+                phone:              member.legislator.phone,
+                state_name:         member.legislator.state_name,
+                stateAbbreviation:  member.legislator.state,
+                title:              member.title,
+                twitter_id:         member.legislator.twitter_id
             };
 
             if (memberObject.title) {
@@ -436,7 +436,6 @@
             first_name: committee.results[0].members[0].legislator.first_name,
             //state: committee.results[0].members[0].legislator.state,
             title: committee.results[0].members[0].title
-
         };
 
 
@@ -451,29 +450,18 @@
             //console.log("HERE", $(this));
             var ID = $(this).data("member-id");
             //console.log("ID: ", ID);
-            memberDetail = _.findWhere(sortedMemberNames, {bioguideId: ID});
-            console.log("memberDetail in click function", memberDetail);
+            memberDetail = _.findWhere(sortedMemberNames, {bioguide_id: ID});
+            //console.log("memberDetail in click function", memberDetail);
             //var htmlDetail = templateDetail(memberDetail);
-            memberDetailFunction("M001111", memberDetail);
+            memberDetailFunction(memberDetail);
         });
-       // var htmlDetail = templateDetail(memberDetail);
 
-
-
-//var context2 = memberDetail;
-//        console.log("memberDetail", memberDetail);
-//        var htmlDetail = templateDetail(memberDetail);
-//        console.log("htmlDetail", htmlDetail);
-//        $('#committee-detail')
-//                .html(htmlDetail);
     }
 
-function memberDetailFunction(memb, mDetail){
+function memberDetailFunction(mDetail){
     console.log("memberDetail from memberDetailFunction", mDetail);
 
-
     //memberDetailFunction("M001111", memberDetail);
-
 
     var source2 = $("#committee-member-detail-template")
             .html();
