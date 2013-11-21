@@ -1,3 +1,12 @@
+
+1. retrieve data for a single member (bioguide_id) on a click event
+$('a').click( function(e.preventDefault() console.log(this.data("memberId");
+) })
+
+
+
+
+
 TODO
 1. populate three dropdown buttons
    or refactor to use twitter Typeahead.js, and populate one input box.
