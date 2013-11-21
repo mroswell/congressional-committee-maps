@@ -35,7 +35,7 @@
             <ul>
                 {{#each sorted_members}}
                 <li><a href="javascript:void(0);" data-member-id="{{bioguide_id}}">
-                    {{memberFirstName}} {{memberLastName}} ({{stateAbbreviation}}{{#if district}}-{{district}}{{/if}}){{#if title}}, {{title}}{{/if}}</a></li>{{/each}}
+                    {{memberFirstName}} {{memberLastName}} ({{party}}), {{stateAbbreviation}}{{#if district}}-{{district}}{{/if}}{{#if title}}, {{title}}{{/if}}</a></li>{{/each}}
             </ul>
         </div>
     </script>
@@ -49,7 +49,8 @@
             District {{stateAbbreviation}}-{{district}}
             {{/unless}}
             <br> {{office}} <br>{{phone}}
-            <br /><a target="_blank" href="{{website}}">Website</a> &bull; <a target="_blank" href="{{contact_form}}">Contact Form</a> &bull; <a target="_blank" href="http://facebook.com/profile.php?id={{facebook_id}}">Facebook</a> &bull; <a href="http://twitter.com/{{twitter_id}}" target="_blank">Twitter</a> &bull; <a href="http://www.opensecrets.org/politicians/summary.php?cid={{crp_id}}" target="_blank">Open Secrets</a>
+                <br /><a target="_blank" href="{{website}}">Website</a> &bull; <a target="_blank" href="{{contact_form}}">Contact Form</a>
+                <br /><a target="_blank" href="http://facebook.com/profile.php?id={{facebook_id}}">Facebook</a> &bull; <a href="http://twitter.com/{{twitter_id}}" target="_blank">Twitter</a> &bull; <a href="http://www.opensecrets.org/politicians/summary.php?cid={{crp_id}}" target="_blank">Open Secrets</a>
             </p>
         </div>
     </script>
@@ -315,15 +316,6 @@
                 });
 
     };
-
-//        var committeeName = $(this).text();
-//        //$('#whichCommittee').empty();
-//        //$('#whichCommittee').append(committeeName);
-//        //console.log("parent", $(this).parent().parent());
-//        $(this).parent().parent()
-//                .css('left', '-99999px')
-//                .removeClass("open");
-//        drawMap(committee);
 
 
     //drawMap('HSAG');
