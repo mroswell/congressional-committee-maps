@@ -133,7 +133,7 @@
                 </ul>
                 <a href="#" class="button committeeButton" data-dropdown="tinyDropJoint" data-options="is_hover:true">Joint Committees &raquo;</a>
                 <ul id="tinyDropJoint" class="f-dropdown" data-dropdown-content style="position: absolute; top: 230px; left: -99999px;">
-                    <li><a href="javascript:void(0);" data-committee="JCSE">Commission on Security and Cooperation in Europe"</a></li>
+                    <li><a href="javascript:void(0);" data-committee="JCSE">Commission on Security and Cooperation in Europe</a></li>
                     <li><a href="javascript:void(0);" data-committee="JSLC">Joint Committee on the Library</a></li>
                     <li><a href="javascript:void(0);" data-committee="JSPR">Joint Committee on Printing</a></li>
                     <li><a href="javascript:void(0);" data-committee="JSTX">Joint Committee on Taxation</a></li>
@@ -161,7 +161,7 @@
         <div class="panel" id="member-detail">
 
             <h5>Featured</h5>
-            <p>Click a district or member for detail.</p>
+            <p>Click a committee member for detail.</p>
         </div>
         <div id="committee-list">
         <!--<h5>Committee Members</h5>-->
@@ -233,13 +233,11 @@
         maxZoom: 18
     }).addTo(map);
 
-    var drawDistricts = function (responseData) {
-        L.geoJson(congressionalDistricts).addTo(map);
-    };
+//    var drawDistricts = function (responseData) {
+//        L.geoJson(congressionalDistricts).addTo(map);
+//    };
     //console.log(committeeRequest.results[0].members[0].legislator.website);
 
-    // create variable called committeeRequest that asks Congress API for the members of the
-    // House Agriculture Committee
 
     var drawMap= function (committee) {
         var committeeRequest = $.ajax({
@@ -408,7 +406,7 @@
                 facebook_id:        member.legislator.facebook_id,
                 memberFirstName:    member.legislator.first_name,
                 memberLastName:     member.legislator.last_name,
-                office_orig:             member.legislator.office,
+                office_orig:        member.legislator.office,
                 office:             member.legislator.office.replace("Building","Bldg."),
                 party:              member.legislator.party,
                 phone:              member.legislator.phone,
@@ -429,7 +427,7 @@
         var sortedArrayOfMemberNames = _(arrayOfCommitteeMembers).sortBy("memberLastName");
 
         var sortedMemberNames = sortedArrayOfMemberChairs.concat(sortedArrayOfMemberNames);
-        console.log("sorted member names", sortedMemberNames);
+        //console.log("sorted member names", sortedMemberNames);
 
 
        // console.log("arrayOfCommitteeMembers", arrayOfCommitteeMembers);
