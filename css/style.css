@@ -2,7 +2,7 @@
 #map { height: 600px; }
 .f-dropdown {
     max-width: 420px;
-    z-index:9000;
+    z-index:1200;
 }
 .f-dropdown li {
     font-size: 0.85em;
@@ -30,8 +30,8 @@
 
 #committee-list li a {
     text-decoration: none;
-    text-indent: 1em;
-    margin-left: -1em;
+    /*text-indent: 1em;*/
+    /*margin-left: -1em;*/
     /*color: #000;*/
 }
 
@@ -40,7 +40,7 @@
 }
 
 #entry-member-detail p {
-    font-size: 90%;
+    font-size: 95%;
     line-height: 1.3;
     margin-bottom: 0;
 }
