@@ -24,7 +24,6 @@
   <script src="maps/cd_dists.js"></script>
   <script src="js/helperFunctions.js"></script>
 
-
   <script src="js/vendor/custom.modernizr.js"></script>
   <script src="js/foundation/foundation.js"></script>
   <script src="js/foundation/foundation.dropdown.js"></script>
@@ -200,28 +199,48 @@ var map = L.map('map').setView(latLng, 4);
 //    var marker = L.marker(latLng).addTo(map);
 
 
-var stateLayer = L.geoJson(statesMap);
-stateLayer.addTo(map).setStyle(function(shape) {
-  return {
-    fillColor: 'white',
+var stateLayer = L.geoJson(statesMap, {style: {
+  fillColor: 'white',
     weight: 1,
     opacity: 0.21,
     color: '#333333',
     dashArray: '0',
     fillOpacity: 0.7
-  };
-});
-var congressLayer = L.geoJson(congressionalDistricts);
-congressLayer.addTo(map).setStyle(function(shape){
-  return {
-    fillColor: 'white',
-    weight: 1,
-    opacity: 0.41,
-    color: '#D7D7D7',
-    dashArray: '0',
-    fillOpacity: 0
   }
 });
+
+stateLayer.addTo(map);
+//stateLayer.addTo(map).setStyle(function(shape) {
+//  return {
+//    fillColor: 'white',
+//    weight: 1,
+//    opacity: 0.21,
+//    color: '#333333',
+//    dashArray: '0',
+//    fillOpacity: 0.7
+//  };
+//});
+var congressLayer = L.geoJson(congressionalDistricts,
+    {style: {
+      fillColor: 'white',
+      weight: 1,
+      opacity: 0.41,
+      color: '#D7D7D7',
+      dashArray: '0',
+      fillOpacity: 0
+      }
+});
+congressLayer.addTo(map);
+//.setStyle(function(shape){
+//  return {
+//    fillColor: 'white',
+//    weight: 1,
+//    opacity: 0.41,
+//    color: '#D7D7D7',
+//    dashArray: '0',
+//    fillOpacity: 0
+//  }
+//});
 
 
 
