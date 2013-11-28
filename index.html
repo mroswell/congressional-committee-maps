@@ -20,7 +20,7 @@
   <!-- custom css -->
   <link rel="stylesheet" href="css/style.css" />
   <!-- states, congressional districts, and helper functions-->
-  <script src="maps/gz_2010_us_040_00_20m.js"></script>
+  <script src="maps/states.js"></script>
   <script src="maps/cd_dists.js"></script>
   <script src="js/helperFunctions.js"></script>
 
@@ -199,7 +199,9 @@ var map = L.map('map').setView(latLng, 4);
 //    var marker = L.marker(latLng).addTo(map);
 
 
-var stateLayer = L.geoJson(statesMap, {style: {
+var stateLayer = L.geoJson(statesMap, {
+  onEachFeature:onEachFeature,
+  style: {
   fillColor: 'white',
     weight: 1,
     opacity: 0.21,
@@ -210,6 +212,7 @@ var stateLayer = L.geoJson(statesMap, {style: {
 });
 
 stateLayer.addTo(map);
+//var stateGroup = L.featureGroup([stateLayer]).addTo(map);
 //stateLayer.addTo(map).setStyle(function(shape) {
 //  return {
 //    fillColor: 'white',
@@ -221,7 +224,9 @@ stateLayer.addTo(map);
 //  };
 //});
 var congressLayer = L.geoJson(congressionalDistricts,
-    {style: {
+    {
+      onEachFeature:onEachFeature,
+      style: {
       fillColor: 'white',
       weight: 1,
       opacity: 0.41,
@@ -231,6 +236,8 @@ var congressLayer = L.geoJson(congressionalDistricts,
       }
 });
 congressLayer.addTo(map);
+//var congressGroup = L.featureGroup([congressLayer]).addTo(map);
+
 //.setStyle(function(shape){
 //  return {
 //    fillColor: 'white',
@@ -269,6 +276,7 @@ var drawMap= function (committee) {
       apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
     }
   }).done(function(committee){
+
         listMembers(committee);
 
         // console.log(committee.results[0].members[3].legislator.website);
@@ -300,7 +308,7 @@ var drawMap= function (committee) {
             weight: 1,
             opacity: 0.41,
             color: 'grey',
-            dashArray: '3',
+            dashArray: '0',
             fillOpacity: 0.7
           });
           congressLayer.setStyle(function(shape) {
@@ -309,7 +317,11 @@ var drawMap= function (committee) {
             var match = states[abbreviation+district];
             //console.log("match: " , match);
             return colorDistrict(match,'house');
-          })
+          });
+          console.dir(congressLayer);
+//          congressLayer.bringToFront();
+//          map.removeLayer(stateLayer);
+            congressLayer.bringToFront();
         } else if (member.chamber==="senate") {
           congressLayer.setStyle({
             display: "none",
@@ -323,10 +335,14 @@ var drawMap= function (committee) {
             // var abbreviation = stateName2Abbrev[stateFips2Name[shape.properties.STATE]];
             // var district = parseInt(shape.properties.CD, 10);  //04 GeoJSON; 4 Congress API
             //var match = states[abbreviation+district];
-            var match = states[shape.properties.NAME];
+            var match = states[shape.properties.name];
             //console.log('match: ' + match);
             return colorDistrict(match,'senate');
-          })
+          });
+          console.dir(stateLayer);
+//          stateLayer.bringToFront();
+//          map.removeLayer(congressLayer);
+          stateLayer.bringToFront();
         }
       });
 
@@ -361,11 +377,11 @@ function colorDistrict(committee, chamber) {
       }
     } else {
       return {
-        fillColor: 'white',
+        fillColor: '#ffffff',
         weight: 1,
         opacity: 0.41,
         color: 'grey',
-        dashArray: '3',
+        dashArray: '0',
         fillOpacity: 0.7
       };
     }
@@ -391,7 +407,7 @@ function colorDistrict(committee, chamber) {
     weight: 1,
     opacity: 1,
     color: 'white',
-    dashArray: '3',
+    dashArray: '0',
     fillOpacity: 0.7
   };
 }
@@ -415,24 +431,24 @@ function listMembers(committee) {
 
   var re = /(Building)\s(Bldg)/
 
-  _.each(committee.results[0].members, function(member, index){
+  _.each(committee.results[0].members, function (member, index) {
     var memberObject = {
-      bioguide_id:        member.legislator.bioguide_id,
-      crp_id:             member.legislator.crp_id,
-      contact_form:       member.legislator.contact_form,
-      district:           member.legislator.district,
-      facebook_id:        member.legislator.facebook_id,
-      memberFirstName:    member.legislator.first_name,
-      memberLastName:     member.legislator.last_name,
-      office_orig:        member.legislator.office,
-      office:             member.legislator.office.replace("Building","Bldg."),
-      party:              member.legislator.party,
-      phone:              member.legislator.phone,
-      state_name:         member.legislator.state_name,
-      stateAbbreviation:  member.legislator.state,
-      title:              member.title,
-      twitter_id:         member.legislator.twitter_id,
-      website:            member.legislator.website
+      bioguide_id: member.legislator.bioguide_id,
+      crp_id: member.legislator.crp_id,
+      contact_form: member.legislator.contact_form,
+      district: member.legislator.district,
+      facebook_id: member.legislator.facebook_id,
+      memberFirstName: member.legislator.first_name,
+      memberLastName: member.legislator.last_name,
+      office_orig: member.legislator.office,
+      office: member.legislator.office.replace("Building", "Bldg."),
+      party: member.legislator.party,
+      phone: member.legislator.phone,
+      state_name: member.legislator.state_name,
+      stateAbbreviation: member.legislator.state,
+      title: member.title,
+      twitter_id: member.legislator.twitter_id,
+      website: member.legislator.website
     };
 
     if (memberObject.title) {
@@ -440,7 +456,8 @@ function listMembers(committee) {
     } else {
       arrayOfCommitteeMembers.push(memberObject);
     }
-  })
+
+  });
   var sortedArrayOfMemberChairs = _(arrayOfCommitteeChairs).sortBy("title");
   var sortedArrayOfMemberNames = _(arrayOfCommitteeMembers).sortBy("memberLastName");
 
@@ -498,6 +515,68 @@ function memberDetailFunction(mDetail){
   console.log("htmlDetail", htmlDetail);
   $('#member-detail').html(htmlDetail);
 }
+
+
+function onEachFeature(feature, layer) {
+  layer.on({
+    //mouseover: highlightFeature,
+    //mouseout: resetHighlight
+    click: mapMemberDetail
+  });
+}
+function mapMemberDetail(e) {
+  var layer = e.target;
+  console.log(layer);
+  console.log(layer.feature.properties.name);
+  var abbreviation = stateName2Abbrev[layer.feature.properties.name];
+  console.log(abbreviation);
+  var district = parseInt(layer.feature.properties.CD, 10);  //04 GeoJSON; 4 Congress API
+  console.log(district);
+  console.log(layer.feature.)
+ // var match = states[abbreviation+district];
+}
+function highlightFeature(e) {
+  // TODO: limit highlight to last-selected layer (House, senate, joint)
+  // TODO: limit popup hover to committee members
+  var layer = e.target;
+  //console.log(layer.getStyle());
+  console.log(layer);
+//  var objString = JSON.stringify(layer);
+  console.log(layer.toSource());
+//  console.log(objString.indexOf("blue"));
+
+//  console.log()
+  if (layer.options) {
+if (layer.options.fillColor === "blue" || layer.options.fillColor === "red" || layer.options.fillColor === "#84207C") {
+  layer.setStyle({
+    weight: 2,
+    color: '#666'
+ //   fillOpacity: 0.7
+
+  });
+};
+  if (!L.Browser.ie && !L.Browser.opera) {
+    layer.bringToFront();
+  }
+}
+}
+
+function resetHighlight(e) {
+  var layer = e.target;
+
+  // TODO: reset back to proper committee member party color
+  console.log('RESET Function');
+
+  layer.setStyle({
+      weight: 1,
+      color: '#ffffff'
+    });
+
+//  stateLayer.resetStyle(e.target);
+
+}
+
+
 
 
 </script>
