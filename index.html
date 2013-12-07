@@ -429,9 +429,7 @@ function listMembers(committee) {
   var arrayOfCommitteeChairs = [];
   var arrayOfCommitteeMembers = [];
 
-  var re = /(Building)\s(Bldg)/
-
-  _.each(committee.results[0].members, function (member, index) {
+  _.each(committee.results[0].members, function (member) {
     var memberObject = {
       bioguide_id: member.legislator.bioguide_id,
       crp_id: member.legislator.crp_id,
@@ -526,7 +524,7 @@ function onEachFeature(feature, layer) {
 }
 function mapMemberDetail(e) {
   var layer = e.target;
-  console.log(layer);
+  //console.dir(layer);
   console.log(layer.feature.properties.name);
   var abbreviation = stateName2Abbrev[layer.feature.properties.name];
   console.log(abbreviation);
@@ -534,6 +532,30 @@ function mapMemberDetail(e) {
   console.log(district);
   //console.log(layer.feature.)
  // var match = states[abbreviation+district];
+
+  var print = function(o){
+    var str='';
+
+    for(var p in o){
+      if(typeof o[p] == 'string'){
+        str+= p + ': ' + o[p]+'; </br>';
+      }else{
+        str+= p + ': { </br>' + print(o[p]) + '}';
+      }
+    }
+
+    return str;
+  };
+
+  var myObject = {
+    name: 'Wilson Page',
+    contact: {
+      email: 'wilson@hotmail.com',
+      tel: '123456789'
+    }
+  };
+
+  $('body').append( print(layer) );
 }
 function highlightFeature(e) {
   // TODO: limit highlight to last-selected layer (House, senate, joint)
@@ -554,7 +576,7 @@ if (layer.options.fillColor === "blue" || layer.options.fillColor === "red" || l
  //   fillOpacity: 0.7
 
   });
-};
+}
   if (!L.Browser.ie && !L.Browser.opera) {
     layer.bringToFront();
   }
