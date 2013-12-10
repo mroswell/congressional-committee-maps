@@ -39,8 +39,8 @@
     </div>
   </script>
   <script id="committee-member-detail-template" type="text/x-handlebars-template">
-
-    <div class="entry" id="entry-member-detail">
+  {{#each members}}
+    <div class="entry entry-member-detail">
       <p><strong>{{memberFirstName}} {{memberLastName}} ({{party}}){{#if title}}, {{title}}{{/if}}</strong>
         <br />{{#unless district}}
         {{state_name}}
@@ -52,6 +52,7 @@
         <br /><a target="_blank" href="http://facebook.com/profile.php?id={{facebook_id}}">Facebook</a> &bull; <a href="http://twitter.com/{{twitter_id}}" target="_blank">Twitter</a> &bull; <a href="http://www.opensecrets.org/politicians/summary.php?cid={{crp_id}}" target="_blank">Open Secrets</a>
       </p>
     </div>
+    {{/each}}
   </script>
 </head>
 
@@ -157,7 +158,6 @@
 
   <aside class="large-3 columns">
     <div class="panel" id="member-detail">
-
       <h5>Featured</h5>
       <p>Click a committee member for detail.</p>
     </div>
@@ -192,6 +192,7 @@
 </footer>
 
 <script>
+var sortedMemberNames;
 var latitude = 39.9;
 var longitude = -98.5;
 var latLng = new L.LatLng(latitude, longitude);
@@ -459,7 +460,7 @@ function listMembers(committee) {
   var sortedArrayOfMemberChairs = _(arrayOfCommitteeChairs).sortBy("title");
   var sortedArrayOfMemberNames = _(arrayOfCommitteeMembers).sortBy("memberLastName");
 
-  var sortedMemberNames = sortedArrayOfMemberChairs.concat(sortedArrayOfMemberNames);
+  sortedMemberNames = sortedArrayOfMemberChairs.concat(sortedArrayOfMemberNames);
   //console.log("sorted member names", sortedMemberNames);
 
 
@@ -504,12 +505,16 @@ function memberDetailFunction(mDetail){
 
   //memberDetailFunction("M001111", memberDetail);
 
+  var memberContext = {
+    members: mDetail instanceof Array ? mDetail : [mDetail]
+  }
+
   var source2 = $("#committee-member-detail-template")
       .html();
   // console.log("source2", source2);
   var templateDetail = Handlebars.compile(source2);
   // console.log("templateDetail", templateDetail);
-  var htmlDetail = templateDetail(mDetail);
+  var htmlDetail = templateDetail(memberContext);
   // console.log("htmlDetail", htmlDetail);
   $('#member-detail').html(htmlDetail);
 }
@@ -522,16 +527,36 @@ function onEachFeature(feature, layer) {
   });
 }
 function mapMemberDetail(e) {
-  var layer = e.target;
+  var boundary = e.target;
   //console.dir(layer);
   //console.log(layer.feature.properties.name);
-  var abbreviation = stateName2Abbrev[layer.feature.properties.name];
+  var color = checkColor(boundary)
+  var members = [];
+  if (color === "blue" || color === "red" || color === "#84207C") {
+    for (var member in sortedMemberNames) {
+    if (boundary.feature.properties.name) {
+      var abbreviation = stateName2Abbrev[boundary.feature.properties.name];
+      if (abbreviation === sortedMemberNames[member].stateAbbreviation) {
+        members.push(sortedMemberNames[member]);
+      }
+    } else if (boundary.feature.properties.CD) {
+      var abbreviation = stateName2Abbrev[stateFips2Name[boundary.feature.properties.STATE]];
+      var district = parseInt(boundary.feature.properties.CD, 10);  //04 GeoJSON; 4 Congress API
+      //var match = states[abbreviation+district];
+      console.log(abbreviation+district);
+      if (abbreviation+district ===sortedMemberNames[member].stateAbbreviation+sortedMemberNames[member].district) {
+        members.push(sortedMemberNames[member]);
+      };
+    }
+    }
+
+  memberDetailFunction(members);
   //console.log(abbreviation);
-  var district = parseInt(layer.feature.properties.CD, 10);  //04 GeoJSON; 4 Congress API
+  var district = parseInt(boundary.feature.properties.CD, 10);  //04 GeoJSON; 4 Congress API
   //console.log(district);
   //console.log(layer.feature.)
  // var match = states[abbreviation+district];
-
+  }
 
 }
 
