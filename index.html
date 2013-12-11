@@ -503,20 +503,23 @@ function listMembers(committee) {
 function memberDetailFunction(mDetail){
   //console.log("memberDetail from memberDetailFunction", mDetail);
 
-  //memberDetailFunction("M001111", memberDetail);
-
   var memberContext = {
     members: mDetail instanceof Array ? mDetail : [mDetail]
-  }
+  };
 
   var source2 = $("#committee-member-detail-template")
       .html();
-  // console.log("source2", source2);
   var templateDetail = Handlebars.compile(source2);
-  // console.log("templateDetail", templateDetail);
+  console.log("memberContext: ", memberContext);
   var htmlDetail = templateDetail(memberContext);
-  // console.log("htmlDetail", htmlDetail);
-  $('#member-detail').html(htmlDetail);
+  if (memberContext.members.length>0) {
+    console.log("length > 1", memberContext.members.length);
+    $('#member-detail').html(htmlDetail);
+  } else {
+    console.log("hurrah");
+    console.log("else", memberContext.members);
+    $('#member-detail').html('<p>Click a committee member<br />for detail.</p>');
+  }
 }
 
 function onEachFeature(feature, layer) {
@@ -549,14 +552,13 @@ function mapMemberDetail(e) {
       };
     }
     }
-
-  memberDetailFunction(members);
   //console.log(abbreviation);
-  var district = parseInt(boundary.feature.properties.CD, 10);  //04 GeoJSON; 4 Congress API
+    var district = parseInt(boundary.feature.properties.CD, 10);  //04 GeoJSON; 4 Congress API
   //console.log(district);
   //console.log(layer.feature.)
  // var match = states[abbreviation+district];
   }
+  memberDetailFunction(members);
 
 }
 
