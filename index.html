@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Congressional Committee Maps</title>`
+  <title>Congressional Committee Maps</title>
   <script src="bower_components/jquery/jquery.js"></script>
   <script src="bower_components/underscore/underscore.js"></script>
   <script src="bower_components/handlebars/handlebars.min.js"></script>
@@ -28,7 +28,6 @@
   <script src="js/foundation/foundation.js"></script>
   <script src="js/foundation/foundation.dropdown.js"></script>
   <script id="committee-member-template" type="text/x-handlebars-template">
-
     <div class="entry">
       <a href="{{committee_results.url}}" target="_blank"><h6>{{ committee_name}} <i class="fa fa-link"></i></h6></a>
       <ul>
@@ -51,6 +50,14 @@
         <br /><a target="_blank" href="{{website}}">Website</a> &bull; <a target="_blank" href="{{contact_form}}">Contact Form</a>
         <br /><a target="_blank" href="http://facebook.com/profile.php?id={{facebook_id}}">Facebook</a> &bull; <a href="http://twitter.com/{{twitter_id}}" target="_blank">Twitter</a> &bull; <a href="http://www.opensecrets.org/politicians/summary.php?cid={{crp_id}}" target="_blank">Open Secrets</a>
       </p>
+    </div>
+    {{/each}}
+  </script>
+
+  <script id="map-hover-template" type="text/x-handlebars-template">
+  {{#each members}}
+    <div class="map-hover">
+      <p><strong>{{memberFirstName}} {{memberLastName}}</strong> ({{party}}, {{#unless district}}{{state_name}}{{else}}{{stateAbbreviation}}-{{district}}{{/unless}}){{#if title}}, {{title}}{{/if}}
     </div>
     {{/each}}
   </script>
@@ -516,8 +523,6 @@ function memberDetailFunction(mDetail){
     console.log("length > 1", memberContext.members.length);
     $('#member-detail').html(htmlDetail);
   } else {
-    console.log("hurrah");
-    console.log("else", memberContext.members);
     $('#member-detail').html('<p>Click a committee member<br />for detail.</p>');
   }
 }
@@ -529,42 +534,42 @@ function onEachFeature(feature, layer) {
     click: mapMemberDetail
   });
 }
-function mapMemberDetail(e) {
-  var boundary = e.target;
-  //console.dir(layer);
-  //console.log(layer.feature.properties.name);
+
+function membersFromBoundary(boundary) {
   var color = checkColor(boundary)
   var members = [];
   if (color === "blue" || color === "red" || color === "#84207C") {
     for (var member in sortedMemberNames) {
-    if (boundary.feature.properties.name) {
-      var abbreviation = stateName2Abbrev[boundary.feature.properties.name];
-      if (abbreviation === sortedMemberNames[member].stateAbbreviation) {
-        members.push(sortedMemberNames[member]);
+      if (boundary.feature.properties.name) {
+        var abbreviation = stateName2Abbrev[boundary.feature.properties.name];
+        if (abbreviation === sortedMemberNames[member].stateAbbreviation) {
+          members.push(sortedMemberNames[member]);
+        }
+      } else if (boundary.feature.properties.CD) {
+        var abbreviation = stateName2Abbrev[stateFips2Name[boundary.feature.properties.STATE]];
+        var district = parseInt(boundary.feature.properties.CD, 10);  //04 GeoJSON; 4 Congress API
+        //var match = states[abbreviation+district];
+        console.log(abbreviation+district);
+        if (abbreviation+district ===sortedMemberNames[member].stateAbbreviation+sortedMemberNames[member].district) {
+          members.push(sortedMemberNames[member]);
+        }
       }
-    } else if (boundary.feature.properties.CD) {
-      var abbreviation = stateName2Abbrev[stateFips2Name[boundary.feature.properties.STATE]];
-      var district = parseInt(boundary.feature.properties.CD, 10);  //04 GeoJSON; 4 Congress API
-      //var match = states[abbreviation+district];
-      console.log(abbreviation+district);
-      if (abbreviation+district ===sortedMemberNames[member].stateAbbreviation+sortedMemberNames[member].district) {
-        members.push(sortedMemberNames[member]);
-      };
     }
-    }
-  //console.log(abbreviation);
-    var district = parseInt(boundary.feature.properties.CD, 10);  //04 GeoJSON; 4 Congress API
-  //console.log(district);
-  //console.log(layer.feature.)
- // var match = states[abbreviation+district];
   }
+  return members;
+}
+function mapMemberDetail(e) {
+  var boundary = e.target;
+  //console.dir(layer);
+  //console.log(layer.feature.properties.name);
+  var members = membersFromBoundary(boundary);
   memberDetailFunction(members);
-
 }
 
 function checkColor(layer) {
-  if (layer.options) return layer.options.fillColor;
-  else if (layer._layers) {
+  if (layer.options) {
+    return layer.options.fillColor;
+  } else if (layer._layers) {
     for (var polyID in layer._layers) {
       return layer._layers[polyID].options.fillColor;
     }
@@ -573,8 +578,13 @@ function checkColor(layer) {
 function highlightFeature(e) {
   // TODO: limit highlight to last-selected layer (House, senate, joint)
   // TODO: limit popup hover to committee members
+
   var boundary = e.target;
   var color = checkColor(e.target);
+  var members = membersFromBoundary(boundary);
+
+  info.update(members);
+
   console.log(e)
 
     if (color === "blue" || color === "red" || color === "#84207C") {
@@ -588,6 +598,7 @@ function highlightFeature(e) {
   }
 }
 function resetHighlight(e) {
+  info.update();
   var layer = e.target;
   var color = checkColor(e.target);
 
@@ -605,7 +616,31 @@ function resetHighlight(e) {
 
 }
 
+var info = L.control();
 
+info.onAdd = function (map) {
+  this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+  this.update();
+  return this._div;
+};
+
+// method that we will use to update the control based on feature properties passed
+info.update = function (members) {
+  var memberContext = {
+    members: members
+  };
+
+  var sourceHover = $("#map-hover-template")
+      .html();
+  var templateDetail = Handlebars.compile(sourceHover);
+  console.log("memberContext: ", memberContext);
+  var htmlDetail = templateDetail(memberContext);
+
+  console.log("members", members);
+  this._div.innerHTML = htmlDetail;
+};
+
+info.addTo(map);
 
 
 </script>
