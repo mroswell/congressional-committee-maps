@@ -33,14 +33,14 @@
       <ul>
         {{#each sorted_members}}
         <li><a href="javascript:void(0);" data-member-id="{{bioguide_id}}">
-          {{memberFirstName}} {{memberLastName}} ({{party}}), {{stateAbbreviation}}{{#if district}}-{{district}}{{/if}}{{#if title}}, {{title}}{{/if}}</a></li>{{/each}}
+          {{first_name}} {{last_name}} ({{party}}), {{stateAbbreviation}}{{#if district}}-{{district}}{{/if}}{{#if title}}, {{title}}{{/if}}</a></li>{{/each}}
       </ul>
     </div>
   </script>
   <script id="committee-member-detail-template" type="text/x-handlebars-template">
   {{#each members}}
     <div class="entry entry-member-detail">
-      <p><strong>{{memberFirstName}} {{memberLastName}} ({{party}}){{#if title}}, {{title}}{{/if}}</strong>
+      <p><strong>{{first_name}} {{last_name}} ({{party}}){{#if title}}, {{title}}{{/if}}</strong>
         <br />{{#unless district}}
         {{state_name}}
         {{else}}
@@ -57,7 +57,7 @@
   <script id="map-hover-template" type="text/x-handlebars-template">
   {{#each members}}
     <div class="map-hover">
-      <p><strong>{{memberFirstName}} {{memberLastName}}</strong> ({{party}}, {{#unless district}}{{state_name}}{{else}}{{stateAbbreviation}}-{{district}}{{/unless}}){{#if title}}, {{title}}{{/if}}
+      <p><strong>{{first_name}} {{last_name}}</strong> ({{party}}, {{#unless district}}{{state_name}}{{else}}{{stateAbbreviation}}-{{district}}{{/unless}}){{#if title}}, {{title}}{{/if}}
     </div>
     {{/each}}
   </script>
@@ -169,7 +169,6 @@
       <p>Click a committee member for detail.</p>
     </div>
     <div id="committee-list">
-      <!--<h5>Committee Members</h5>-->
 
     </div>
 
@@ -204,8 +203,6 @@ var latitude = 39.9;
 var longitude = -98.5;
 var latLng = new L.LatLng(latitude, longitude);
 var map = L.map('map').setView(latLng, 4);
-//    var marker = L.marker(latLng).addTo(map);
-
 
 var stateLayer = L.geoJson(statesMap, {
   onEachFeature:onEachFeature,
@@ -220,17 +217,7 @@ var stateLayer = L.geoJson(statesMap, {
 });
 
 stateLayer.addTo(map);
-//var stateGroup = L.featureGroup([stateLayer]).addTo(map);
-//stateLayer.addTo(map).setStyle(function(shape) {
-//  return {
-//    fillColor: 'white',
-//    weight: 1,
-//    opacity: 0.21,
-//    color: '#333333',
-//    dashArray: '0',
-//    fillOpacity: 0.7
-//  };
-//});
+
 var congressLayer = L.geoJson(congressionalDistricts,
     {
       onEachFeature:onEachFeature,
@@ -244,18 +231,6 @@ var congressLayer = L.geoJson(congressionalDistricts,
       }
 });
 congressLayer.addTo(map);
-//var congressGroup = L.featureGroup([congressLayer]).addTo(map);
-
-//.setStyle(function(shape){
-//  return {
-//    fillColor: 'white',
-//    weight: 1,
-//    opacity: 0.41,
-//    color: '#D7D7D7',
-//    dashArray: '0',
-//    fillOpacity: 0
-//  }
-//});
 
 
 L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png', {
@@ -264,11 +239,6 @@ L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png',
   styleId: 96931,
   maxZoom: 18
 }).addTo(map);
-
-//    var drawDistricts = function (responseData) {
-//        L.geoJson(congressionalDistricts).addTo(map);
-//    };
-//console.log(committeeRequest.results[0].members[0].legislator.website);
 
 
 var drawMap= function (committee) {
@@ -287,19 +257,15 @@ var drawMap= function (committee) {
 
         listMembers(committee);
 
-        // console.log(committee.results[0].members[3].legislator.website);
         var members = committee.results[0].members;
         var states = {};
         var districtName = {};
         for (var i = 0; i < members.length; i++) {
           var member = members[i].legislator;
           if (member.chamber==="house") {
-            //console.log(member.chamber);
             districtName = member.state+member.district;
-            //console.log(districtName);
           } else {
             districtName = member.state_name;
-            //console.log(districtName);
           }
 
           if (!states[districtName]) {
@@ -308,7 +274,6 @@ var drawMap= function (committee) {
             states[districtName].push(member);
           }
         }
-        //console.log(states);
         if (member.chamber==="house") {
 
           stateLayer.setStyle({
@@ -323,13 +288,10 @@ var drawMap= function (committee) {
             var abbreviation = stateName2Abbrev[stateFips2Name[shape.properties.STATE]];
             var district = parseInt(shape.properties.CD, 10);  //04 GeoJSON; 4 Congress API
             var match = states[abbreviation+district];
-            //console.log("match: " , match);
             return colorDistrict(match,'house');
           });
-          // console.dir(congressLayer);
-//          congressLayer.bringToFront();
-//          map.removeLayer(stateLayer);
-            congressLayer.bringToFront();
+
+          congressLayer.bringToFront();
         } else if (member.chamber==="senate") {
           congressLayer.setStyle({
             display: "none",
@@ -337,19 +299,11 @@ var drawMap= function (committee) {
             fillColor: "transparent"
           });
 
-
           stateLayer.setStyle(function(shape) {
-
-            // var abbreviation = stateName2Abbrev[stateFips2Name[shape.properties.STATE]];
-            // var district = parseInt(shape.properties.CD, 10);  //04 GeoJSON; 4 Congress API
-            //var match = states[abbreviation+district];
             var match = states[shape.properties.name];
-            //console.log('match: ' + match);
             return colorDistrict(match,'senate');
           });
-         // console.dir(stateLayer);
-//          stateLayer.bringToFront();
-//          map.removeLayer(congressLayer);
+
           stateLayer.bringToFront();
         }
       });
@@ -357,23 +311,18 @@ var drawMap= function (committee) {
 };
 
 
-//drawMap('HSAG');
+
 $("[data-committee]").on("click", function(e) {
   e.preventDefault();
   //console.log($(this));
   var committee = $(this).data("committee");
-  //console.log("dropdown: ", $(this));
-//        var committeeName = $(this).text();
-  //$('#whichCommittee').empty();
-  //$('#whichCommittee').append(committeeName);
-  //console.log("parent", $(this).parent().parent());
+
   $(this).parent().parent()
       .css('left', '-99999px')
       .removeClass("open");
   drawMap(committee);
 
 });
-//$('ul li a').on("click",function(e){
 
 function colorDistrict(committee, chamber) {
   if (!committee) {
@@ -421,41 +370,15 @@ function colorDistrict(committee, chamber) {
 }
 function listMembers(committee) {
 
-  // find ID for legislator
-  //console.log("you are here.")
-
-  //console.log(committee.results[0].name);
-  var source = $("#committee-member-template")
-      .html();
-
-
-  var template = Handlebars.compile(source);
-
-  // console.log(committee.results[0].members);
-
 
   var arrayOfCommitteeChairs = [];
   var arrayOfCommitteeMembers = [];
 
   _.each(committee.results[0].members, function (member) {
-    var memberObject = {
-      bioguide_id: member.legislator.bioguide_id,
-      crp_id: member.legislator.crp_id,
-      contact_form: member.legislator.contact_form,
-      district: member.legislator.district,
-      facebook_id: member.legislator.facebook_id,
-      memberFirstName: member.legislator.first_name,
-      memberLastName: member.legislator.last_name,
-      office_orig: member.legislator.office,
-      office: member.legislator.office.replace("Building", "Bldg."),
-      party: member.legislator.party,
-      phone: member.legislator.phone,
-      state_name: member.legislator.state_name,
-      stateAbbreviation: member.legislator.state,
-      title: member.title,
-      twitter_id: member.legislator.twitter_id,
-      website: member.legislator.website
-    };
+   var memberObject = member.legislator;
+    memberObject.title = member.title;
+    memberObject.office = memberObject.office.replace("Building", "Bldg.");
+    memberObject.stateAbbreviation = memberObject.state;
 
     if (memberObject.title) {
       arrayOfCommitteeChairs.push(memberObject);
@@ -468,12 +391,6 @@ function listMembers(committee) {
   var sortedArrayOfMemberNames = _(arrayOfCommitteeMembers).sortBy("memberLastName");
 
   sortedMemberNames = sortedArrayOfMemberChairs.concat(sortedArrayOfMemberNames);
-  //console.log("sorted member names", sortedMemberNames);
-
-
-  // console.log("arrayOfCommitteeMembers", arrayOfCommitteeMembers);
-  //return arrayOfStateNamesForThisCommittee;
-  // };
 
 
   var context = {
@@ -483,42 +400,33 @@ function listMembers(committee) {
     committee_members: committee.results[0].members[0].legislator,
     sorted_members: sortedMemberNames,
     first_name: committee.results[0].members[0].legislator.first_name,
-    //state: committee.results[0].members[0].legislator.state,
     title: committee.results[0].members[0].title
   };
 
 
-  var html = template(context);
+  var html = app.memberTemplate(context);
   $('#committee-list')
       .html(html);
-  // console.log(committee);
 
   var memberDetail;
 
   $("[data-member-id]").on("click", function(e) {
-    //console.log("HERE", $(this));
     var ID = $(this).data("member-id");
-    //console.log("ID: ", ID);
     memberDetail = _.findWhere(sortedMemberNames, {bioguide_id: ID});
-    //console.log("memberDetail in click function", memberDetail);
-    //var htmlDetail = templateDetail(memberDetail);
     memberDetailFunction(memberDetail);
   });
 
 }
 
 function memberDetailFunction(mDetail){
-  //console.log("memberDetail from memberDetailFunction", mDetail);
 
   var memberContext = {
     members: mDetail instanceof Array ? mDetail : [mDetail]
   };
 
-  var source2 = $("#committee-member-detail-template")
-      .html();
-  var templateDetail = Handlebars.compile(source2);
   console.log("memberContext: ", memberContext);
-  var htmlDetail = templateDetail(memberContext);
+  var htmlDetail = app.memberDetail(memberContext);
+//  var htmlDetail = templateDetail(memberContext);
   if (memberContext.members.length>0) {
     console.log("length > 1", memberContext.members.length);
     $('#member-detail').html(htmlDetail);
@@ -529,7 +437,7 @@ function memberDetailFunction(mDetail){
 
 function onEachFeature(feature, layer) {
   layer.on({
-     mouseover: highlightFeature,
+    mouseover: highlightFeature,
     mouseout: resetHighlight,
     click: mapMemberDetail
   });
@@ -560,8 +468,7 @@ function membersFromBoundary(boundary) {
 }
 function mapMemberDetail(e) {
   var boundary = e.target;
-  //console.dir(layer);
-  //console.log(layer.feature.properties.name);
+
   var members = membersFromBoundary(boundary);
   memberDetailFunction(members);
 }
@@ -630,18 +537,32 @@ info.update = function (members) {
     members: members
   };
 
-  var sourceHover = $("#map-hover-template")
-      .html();
-  var templateDetail = Handlebars.compile(sourceHover);
   console.log("memberContext: ", memberContext);
-  var htmlDetail = templateDetail(memberContext);
+  var htmlDetail = app.templateDetail(memberContext);
 
   console.log("members", members);
   this._div.innerHTML = htmlDetail;
 };
 
-info.addTo(map);
 
+var app = {};
+
+function init() {
+  var source = $("#committee-member-template")
+      .html();
+  app.memberTemplate = Handlebars.compile(source);
+
+  var sourceHover = $("#map-hover-template")
+      .html();
+  app.templateDetail = Handlebars.compile(sourceHover);
+
+  var source2 = $("#committee-member-detail-template")
+      .html();
+  app.memberDetail = Handlebars.compile(source2);
+  info.addTo(map);
+}
+
+init();
 
 </script>
 
