@@ -21,7 +21,7 @@
   <link rel="stylesheet" href="css/style.css" />
   <!-- states, congressional districts, and helper functions-->
   <script src="maps/states.js"></script>
-  <script src="maps/cd_dists.js"></script>
+  <script src="maps/congress113.js"></script>
   <script src="js/helperFunctions.js"></script>
 
   <script src="js/vendor/custom.modernizr.js"></script>
@@ -285,9 +285,12 @@ var drawMap= function (committee) {
             fillOpacity: 0.7
           });
           congressLayer.setStyle(function(shape) {
-            var abbreviation = stateName2Abbrev[stateFips2Name[shape.properties.STATE]];
-            var district = parseInt(shape.properties.CD, 10);  //04 GeoJSON; 4 Congress API
-            var match = states[abbreviation+district];
+//            var abbreviation = stateName2Abbrev[stateFips2Name[shape.properties.STATE]];
+//            var district = parseInt(shape.properties.CD, 10);  //04 GeoJSON; 4 Congress API
+//            var match = states[abbreviation+district];
+            var match = states[shape.properties.DISTRICT];
+//            console.log('MATCH-HOUSE', match);
+
             return colorDistrict(match,'house');
           });
 
@@ -301,6 +304,8 @@ var drawMap= function (committee) {
 
           stateLayer.setStyle(function(shape) {
             var match = states[shape.properties.name];
+
+//            console.log('MATCH-SENATE', match);
             return colorDistrict(match,'senate');
           });
 
@@ -316,6 +321,7 @@ $("[data-committee]").on("click", function(e) {
   e.preventDefault();
   //console.log($(this));
   var committee = $(this).data("committee");
+//  console.log ('committee', committee);
 
   $(this).parent().parent()
       .css('left', '-99999px')
@@ -343,17 +349,18 @@ function colorDistrict(committee, chamber) {
       };
     }
   }
-
   var parties = _.map(committee, function(member){
     return member.party;
   });
   var hasDem = parties.indexOf("D") > -1;
   var hasRep = parties.indexOf("R") > -1;
+
   var color;
   if (hasDem && hasRep) {
     color = "#84207C";//"#86307A";//"purple";
   } else {
     if (hasDem) {
+
       color = "blue";//"#0920d3";//"#1464C8";//"#2553A8";//"#0F2CB9";//"#0B22E3";//"#1B55B9";//"#1644C7";//"#2166AC";//"#4393C3";//"#2424FF"; //80% blue
     } else {
       color = "red";//"#d30c09";//"#c81714";//"#F1100D";//"#DD2820";//"#D73027";//"#B2182B";//"red";
@@ -453,12 +460,19 @@ function membersFromBoundary(boundary) {
         if (abbreviation === sortedMemberNames[member].stateAbbreviation) {
           members.push(sortedMemberNames[member]);
         }
-      } else if (boundary.feature.properties.CD) {
-        var abbreviation = stateName2Abbrev[stateFips2Name[boundary.feature.properties.STATE]];
-        var district = parseInt(boundary.feature.properties.CD, 10);  //04 GeoJSON; 4 Congress API
-        //var match = states[abbreviation+district];
-        console.log(abbreviation+district);
-        if (abbreviation+district ===sortedMemberNames[member].stateAbbreviation+sortedMemberNames[member].district) {
+//      } else if (boundary.feature.properties.CD) {
+      } else if (boundary.feature.properties.DISTRICT) {
+//        var abbreviation = stateName2Abbrev[stateFips2Name[boundary.feature.properties.STATE]];
+//        var abbreviation = boundary.feature.properties.STATE;
+//
+//        var district = parseInt(boundary.feature.properties.CD, 10);  //04 GeoJSON; 4 Congress API
+//        //var match = states[abbreviation+district];
+//        console.log(abbreviation+district);
+//        if (abbreviation+district ===sortedMemberNames[member].stateAbbreviation+sortedMemberNames[member].district) {
+//          members.push(sortedMemberNames[member]);
+        if (boundary.feature.properties.DISTRICT ===sortedMemberNames[member].stateAbbreviation+sortedMemberNames[member].district) {
+          console.log("member", member);
+
           members.push(sortedMemberNames[member]);
         }
       }
