@@ -20,7 +20,7 @@
   <!-- custom css -->
   <link rel="stylesheet" href="css/style.css" />
   <!-- states, congressional districts, and helper functions-->
-  <script src="maps/states.js"></script>
+  <script src="maps/statemap.js"></script>
   <script src="maps/congress113.js"></script>
   <script src="js/helperFunctions.js"></script>
 
@@ -264,6 +264,7 @@ var drawMap= function (committee) {
           var member = members[i].legislator;
           if (member.chamber==="house") {
             districtName = member.state+member.district;
+            console.log("member.district: ", member.district, "districtName: ", districtName)
           } else {
             districtName = member.state_name;
           }
@@ -289,7 +290,7 @@ var drawMap= function (committee) {
 //            var district = parseInt(shape.properties.CD, 10);  //04 GeoJSON; 4 Congress API
 //            var match = states[abbreviation+district];
             var match = states[shape.properties.DISTRICT];
-//            console.log('MATCH-HOUSE', match);
+            console.log('MATCH-HOUSE', match);
 
             return colorDistrict(match,'house');
           });
@@ -472,7 +473,6 @@ function membersFromBoundary(boundary) {
 //          members.push(sortedMemberNames[member]);
         if (boundary.feature.properties.DISTRICT ===sortedMemberNames[member].stateAbbreviation+sortedMemberNames[member].district) {
           console.log("member", member);
-
           members.push(sortedMemberNames[member]);
         }
       }
