@@ -134,10 +134,8 @@
   </div>
 
 </div>
-<!--</div>-->
 
 <!-- End Nav -->
-
 
 <!-- Main Page Content and Sidebar -->
 
@@ -151,14 +149,10 @@
 
       <!--</div>-->
       <div class="row">
-
         <div class="large-12 columns" id="map">
         </div>
       </div>
-
-    <!--</section>-->
-
-
+    </section>
   </div>
 
   <!-- End Main Content -->
@@ -172,10 +166,7 @@
       <p>Click a committee member for detail.</p>
     </div>
     <div id="committee-list">
-
     </div>
-
-
   </aside>
 
   <!-- End Sidebar -->
@@ -201,6 +192,7 @@
 </footer>
 
 <script>
+console.log(statesMap);
 var sortedMemberNames;
 var latitude = 39.9;
 var longitude = -98.5;
@@ -237,7 +229,7 @@ congressLayer.addTo(map);
 
 
 L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png', {
-  attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+  attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="http://cloudmade.com">CloudMade</a>',
   key: '4733d063f9704b1c940a64459b1263e9',
   styleId: 96931,
   maxZoom: 18
