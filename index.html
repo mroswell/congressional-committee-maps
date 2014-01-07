@@ -40,7 +40,7 @@
   <script id="committee-member-detail-template" type="text/x-handlebars-template">
   {{#each members}}
     <div class="entry entry-member-detail">
-      <p><strong>{{first_name}} {{last_name}} ({{party}}){{#if title}}, {{title}}{{/if}}</strong>
+      <p style="margin-bottom:0;"><strong>{{first_name}} {{last_name}} ({{party}}){{#if title}}, {{title}}{{/if}}</strong>
         <br />{{#unless district}}
         {{state_name}}
         {{else}}
@@ -68,8 +68,9 @@
   $(document).foundation();
 </script>
 <div class="row">
-  <div class="large-12 columns" style="margin-left:-15px;margin-top:15px;">
+  <div class="large-11 columns" style="margin-left:-15px;margin-top:15px;">
     <h1 style="display:inline">Congressional Committee Maps</h1>
+    <span class="rwd-line">
     <a href="#" style="margin-right:10px;margin-left:12px;" class="button committeeButton" data-dropdown="tinyDropHouse" data-options="is_hover:true">House Committees &raquo;</a>
     <ul id="tinyDropHouse" class="f-dropdown" data-dropdown-content style="position: absolute; top: 230px; left: -99999px;">
       <li><a href="#" data-committee="HSAG">House Committee on Agriculture</a></li>
@@ -96,7 +97,7 @@
 
     </ul>
     <a href="#" class="button committeeButton" data-dropdown="tinyDropSenate" data-options="is_hover:true">Senate Committees &raquo;</a>
-    <ul id="tinyDropSenate" class="f-dropdown" data-dropdown-content style="position: absolute; top: 230px; left: -99999px; max-width:445px;">
+    <ul id="tinyDropSenate" class="f-dropdown" data-dropdown-content style="position: absolute; top: 230px; left: -99999px; max-width:470px; ">
 
       <li><a href="#" data-committee="SSAF">Senate Committee on Agriculture, Nutrition, and Forestry</a></li>
       <li><a href="#" data-committee="SSAP">Senate Committee on Appropriations</a></li>
@@ -111,7 +112,6 @@
       <li><a href="#" data-committee="SSGA">Senate Committee on Homeland Security and Governmental Affairs</a></li>
       <li><a href="#" data-committee="SSHR">Senate Committee on Health, Education, Labor, and Pensions</a></li>
       <li><a href="#" data-committee="SLIA">Senate Committee on Indian Affairs</a></li>
-
       <li><a href="#" data-committee="SSJU">Senate Committee on the Judiciary</a></li>
       <li><a href="#" data-committee="SSRA">Senate Committee on Rules and Administration</a></li>
       <li><a href="#" data-committee="SSSB">Senate Committee on Small Business and Entrepreneurship</a></li>
@@ -122,6 +122,7 @@
       <li><a href="#" data-committee="SCNC">United States Senate Caucus on International Narcotics Control</a></li>
 
     </ul>
+    </span>
     <!--<a href="#" class="button committeeButton" data-dropdown="tinyDropJoint" data-options="is_hover:true">Joint Committees &raquo;</a>-->
     <!--<ul id="tinyDropJoint" class="f-dropdown" data-dropdown-content style="position: absolute; top: 230px; left: -99999px;">-->
     <!--<li><a href="#" data-committee="JCSE">Commission on Security and Cooperation in Europe</a></li>-->
@@ -160,10 +161,9 @@
 
   <!-- Sidebar -->
 
-  <aside class="large-3 columns">
+  <aside class="large-3 columns" style="margin-top:-67px;">
     <div class="panel" id="member-detail">
-      <h5>Featured</h5>
-      <p>Click a committee member for detail.</p>
+      <p>Select a committee, then click a committee member for detail.</p>
     </div>
     <div id="committee-list">
     </div>
@@ -434,7 +434,7 @@ function memberDetailFunction(mDetail){
     console.log("length > 1", memberContext.members.length);
     $('#member-detail').html(htmlDetail);
   } else {
-    $('#member-detail').html('<p>Click a committee member<br />for detail.</p>');
+    $('#member-detail').html('<p>Click a committee member<br />for detail. <br />Click the <i class="fa fa-link"></i> icon to visit the committee website. (It will open in a new window.) </p>');
   }
 }
 

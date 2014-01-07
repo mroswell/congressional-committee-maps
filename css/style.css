@@ -1,7 +1,7 @@
 .row {max-width:78em;}
 #map { height: 575px; }
 .f-dropdown {
-    max-width: 420px;
+    max-width: 452px;
     z-index:1200;
 }
 .f-dropdown li {
@@ -48,13 +48,21 @@
 
 }
 
-h1 {font-size: 2em;}
+h1 {font-size: 1.65em;}
 
 .f-dropdown > *:first-child {margin-top: 3px;}
 
 .f-dropdown li a {
     margin-left:0.5em;
-    margine-right:0.5em
+    margin-right:0.5em
 }
 
 .entry-member-detail a {font-size: .95em;}
+
+/* move both committee lists down if less than 1100px wide
+   http://danielmall.com/articles/responsive-line-breaks/ */
+.rwd-line { display: block; }
+
+@media screen and (min-width: 1100px){
+        .rwd-line { display: inline; }
+    }
