@@ -192,7 +192,7 @@
 </footer>
 
 <script>
-console.log(statesMap);
+// console.log(statesMap);
 var sortedMemberNames;
 var latitude = 39.9;
 var longitude = -98.5;
@@ -259,7 +259,7 @@ var drawMap= function (committee) {
           var member = members[i].legislator;
           if (member.chamber==="house") {
             districtName = member.state+member.district;
-            console.log("member.district: ", member.district, "districtName: ", districtName)
+            // console.log("member.district: ", member.district, "districtName: ", districtName)
           } else {
             districtName = member.state_name;
           }
@@ -285,7 +285,7 @@ var drawMap= function (committee) {
 //            var district = parseInt(shape.properties.CD, 10);  //04 GeoJSON; 4 Congress API
 //            var match = states[abbreviation+district];
             var match = states[shape.properties.DISTRICT];
-            console.log('MATCH-HOUSE', match);
+            //console.log('MATCH-HOUSE', match);
 
             return colorDistrict(match,'house');
           });
@@ -427,11 +427,11 @@ function memberDetailFunction(mDetail){
     members: mDetail instanceof Array ? mDetail : [mDetail]
   };
 
-  console.log("memberContext: ", memberContext);
+  // console.log("memberContext: ", memberContext);
   var htmlDetail = app.memberDetail(memberContext);
 //  var htmlDetail = templateDetail(memberContext);
   if (memberContext.members.length>0) {
-    console.log("length > 1", memberContext.members.length);
+   // console.log("length > 1", memberContext.members.length);
     $('#member-detail').html(htmlDetail);
   } else {
     $('#member-detail').html('<p>Click a committee member<br />for detail. <br />Click the <i class="fa fa-link"></i> icon to visit the committee website. (It will open in a new window.) </p>');
@@ -467,7 +467,7 @@ function membersFromBoundary(boundary) {
 //        if (abbreviation+district ===sortedMemberNames[member].stateAbbreviation+sortedMemberNames[member].district) {
 //          members.push(sortedMemberNames[member]);
         if (boundary.feature.properties.DISTRICT ===sortedMemberNames[member].stateAbbreviation+sortedMemberNames[member].district) {
-          console.log("member", member);
+        //  console.log("member", member);
           members.push(sortedMemberNames[member]);
         }
       }
@@ -501,7 +501,7 @@ function highlightFeature(e) {
 
   info.update(members);
 
-  console.log(e)
+ // console.log(e)
 
     if (color === "blue" || color === "red" || color === "#84207C") {
       boundary.setStyle({
@@ -546,10 +546,10 @@ info.update = function (members) {
     members: members
   };
 
-  console.log("memberContext: ", memberContext);
+ // console.log("memberContext: ", memberContext);
   var htmlDetail = app.templateDetail(memberContext);
 
-  console.log("members", members);
+ // console.log("members", members);
   this._div.innerHTML = htmlDetail;
 };
 
