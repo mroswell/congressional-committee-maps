@@ -285,7 +285,7 @@ var drawMap= function (committee) {
 //            var district = parseInt(shape.properties.CD, 10);  //04 GeoJSON; 4 Congress API
 //            var match = states[abbreviation+district];
             var match = states[shape.properties.DISTRICT];
-            console.log('MATCH-HOUSE', match);
+        //    console.log('MATCH-HOUSE', match);
 
             return colorDistrict(match,'house');
           });
