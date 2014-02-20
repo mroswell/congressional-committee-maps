@@ -384,14 +384,16 @@ function colorDistrict(committee, chamber) {
 }
 function listMembers(committee) {
 
-
   var arrayOfCommitteeChairs = [];
   var arrayOfCommitteeMembers = [];
 
   _.each(committee.results[0].members, function (member) {
    var memberObject = member.legislator;
     memberObject.title = member.title;
-    memberObject.office = memberObject.office.replace("Building", "Bldg.");
+
+    if (memberObject.office != null) {
+      memberObject.office = memberObject.office.replace("Building", "Bldg.");
+    }
     memberObject.stateAbbreviation = memberObject.state;
 
     if (memberObject.title) {
