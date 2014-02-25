@@ -250,7 +250,7 @@ L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png',
 var drawMap= function (committee) {
   var committeeRequest = $.ajax({
     dataType: "json",
-    url: "http://congress.api.sunlightfoundation.com/committees",
+    url: "https://congress.api.sunlightfoundation.com/committees",
     data: {
       per_page: "all",
       //chamber: "house",
