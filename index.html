@@ -131,26 +131,13 @@
       <li><a href="#" data-committee="SLIN">Senate Select Committee on Intelligence</a></li>
       <li><a href="#" data-committee="SPAG">Senate Special Committee on Aging</a></li>
       <li><a href="#" data-committee="SCNC">United States Senate Caucus on International Narcotics Control</a></li>
-
     </ul>
     </span>
-    <!--<a href="#" class="button committeeButton" data-dropdown="tinyDropJoint" data-options="is_hover:true">Joint Committees &raquo;</a>-->
-    <!--<ul id="tinyDropJoint" class="f-dropdown" data-dropdown-content style="position: absolute; top: 230px; left: -99999px;">-->
-    <!--<li><a href="#" data-committee="JCSE">Commission on Security and Cooperation in Europe</a></li>-->
-    <!--<li><a href="#" data-committee="JSLC">Joint Committee on the Library</a></li>-->
-    <!--<li><a href="#" data-committee="JSPR">Joint Committee on Printing</a></li>-->
-    <!--<li><a href="#" data-committee="JSTX">Joint Committee on Taxation</a></li>-->
-    <!--<li><a href="#" data-committee="JSEC">Joint Economic Committee</a></li>-->
-    <!--</ul>-->
-
   </div>
-
 </div>
-
 <!-- End Nav -->
 
 <!-- Main Page Content and Sidebar -->
-
 <div class="row">
 
   <!-- Main Content -->
@@ -170,7 +157,6 @@
   <!-- End Main Content -->
 
 
-  <!-- Sidebar -->
 
   <aside class="large-3 columns" >
     <div class="panel" id="member-detail">
@@ -238,13 +224,14 @@ var congressLayer = L.geoJson(congressionalDistricts,
 });
 congressLayer.addTo(map);
 
-
-L.tileLayer('http://{s}.tile.cloudmade.com/{key}/{styleId}/256/{z}/{x}/{y}.png', {
-  attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="http://cloudmade.com">CloudMade</a>',
-  key: '4733d063f9704b1c940a64459b1263e9',
-  styleId: 96931,
-  maxZoom: 18
-}).addTo(map);
+        L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+          maxZoom: 18,
+          attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+              '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+              'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+          id: 'mroswell.i6hfjp09'
+        }).addTo(map);
+        //iadoid0h
 
 
 var drawMap= function (committee) {
@@ -471,14 +458,6 @@ function membersFromBoundary(boundary) {
         }
 //      } else if (boundary.feature.properties.CD) {
       } else if (boundary.feature.properties.DISTRICT) {
-//        var abbreviation = stateName2Abbrev[stateFips2Name[boundary.feature.properties.STATE]];
-//        var abbreviation = boundary.feature.properties.STATE;
-//
-//        var district = parseInt(boundary.feature.properties.CD, 10);  //04 GeoJSON; 4 Congress API
-//        //var match = states[abbreviation+district];
-//        console.log(abbreviation+district);
-//        if (abbreviation+district ===sortedMemberNames[member].stateAbbreviation+sortedMemberNames[member].district) {
-//          members.push(sortedMemberNames[member]);
         if (boundary.feature.properties.DISTRICT ===sortedMemberNames[member].stateAbbreviation+sortedMemberNames[member].district) {
         //  console.log("member", member);
           members.push(sortedMemberNames[member]);
