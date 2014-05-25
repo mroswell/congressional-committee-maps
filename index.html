@@ -133,7 +133,10 @@
       <li><a href="#" data-committee="SCNC">United States Senate Caucus on International Narcotics Control</a></li>
     </ul>
     </span>
+    <input id="subcomms" type="checkbox"/> Display Subcommittees
   </div>
+  <select name="selectid" id="selectid" style="display:none;">
+    <option></option></select>
 </div>
 <!-- End Nav -->
 
@@ -190,6 +193,7 @@
 
 <script>
 // console.log(statesMap);
+var subcomms = false;
 var sortedMemberNames;
 var latitude = 39.9;
 var longitude = -98.5;
@@ -235,6 +239,30 @@ congressLayer.addTo(map);
 
 
 var drawMap= function (committee) {
+  console.log('subcomms!!!', subcomms);
+
+  if (subcomms) {
+    console.log('subcomms!!');
+//    committee = 'HSAG22';
+
+    var subcommitteeRequest = $.ajax({
+      dataType: "json",
+      url: "https://congress.api.sunlightfoundation.com/committees",
+      data: {
+        per_page: "all",
+        //chamber: "house",
+        parent_committee_id: committee,
+      subcommittee: true,
+        apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
+      }
+    }).done(function(subcommittee){
+          console.log(subcommittee);
+          for (var i = 0; i <subcommittee.results.length; i++) {
+            console.log("you are here.")
+            console.log(subcommittee.results[i]);
+          }
+        })
+  }
   var committeeRequest = $.ajax({
     dataType: "json",
     url: "https://congress.api.sunlightfoundation.com/committees",
@@ -242,7 +270,7 @@ var drawMap= function (committee) {
       per_page: "all",
       //chamber: "house",
       committee_id: committee,
-      subcommittee: false,
+//      subcommittee: false,
       fields: 'name,committee_id,office,subcommittee,phone,url,members',
       apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
     }
@@ -307,6 +335,29 @@ var drawMap= function (committee) {
       });
 
 };
+
+
+$("#subcomms").change(function() {
+   subcomms = this.checked ? true : false;
+  console.log(subcomms);
+
+  if (subcomms) {
+//    console.log("subcomms")
+//    var select = $("select");
+//    select.show();
+//    var opt = $("<option></option>");
+//    opt.val("HSAG");
+//    opt.html("Option HSAG");
+//    select.append(opt);
+//    select.val(opt.val());
+  } else {
+    var select = $("select");
+    select.empty();
+    select.hide();
+    console.log("no subcomms");
+  }
+});
+
 
 
 
