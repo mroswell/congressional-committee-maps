@@ -240,10 +240,12 @@ congressLayer.addTo(map);
 
 var drawMap= function (committee) {
   console.log('subcomms!!!', subcomms);
+    var select = $("select");
 
   if (subcomms) {
     console.log('subcomms!!');
 //    committee = 'HSAG22';
+
 
     var subcommitteeRequest = $.ajax({
       dataType: "json",
@@ -256,10 +258,27 @@ var drawMap= function (committee) {
         apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
       }
     }).done(function(subcommittee){
+
+          select.show();
+          var opt = $("<option></option>");
+//          opt.val("HSAG");
+//          opt.html("Option HSAG");
+//          select.append(opt);
+//          select.val(opt.val());
           console.log(subcommittee);
+          select.empty();
+
           for (var i = 0; i <subcommittee.results.length; i++) {
             console.log("you are here.")
             console.log(subcommittee.results[i]);
+            var subname = subcommittee.results[i].name;
+
+            opt.val(subname);
+            console.log(subname);
+            opt.html(subname);
+            select.append(opt);
+            select.val(opt.val());
+            committee = subcommittee.results[i].committee_id;
           }
         })
   }
