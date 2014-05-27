@@ -196,6 +196,7 @@
 <script>
 // console.log(statesMap);
 var subcomms = false;
+var prev_committee="";
 var sortedMemberNames;
 var latitude = 39.9;
 var longitude = -98.5;
@@ -244,43 +245,43 @@ var drawMap= function (committee) {
   console.log('subcomms!!!', subcomms);
     var select = $("select");
 
-  if (subcomms) {
-    console.log('subcomms!!');
-//    committee = 'HSAG22';
-
-
-    var subcommitteeRequest = $.ajax({
-      dataType: "json",
-      url: "https://congress.api.sunlightfoundation.com/committees",
-      data: {
-        per_page: "all",
-        //chamber: "house",
-        parent_committee_id: committee,
-        subcommittee: true,
-        apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
-      }
-    }).done(function(subcommittee){
-
-          select.show();
-          var opt = $("<option></option>");
-          console.log(subcommittee);
-          if (true) select.empty(); // if parent_committee_id != last-selected committee
-          for (var i = 0; i <subcommittee.results.length; i++) {
-            console.log(subcommittee.results[i]);
-            var subname = subcommittee.results[i].name;
-            var subabbrev = subcommittee.results[i].committee_id;
-            opt.val(subabbrev);
-            console.log(subname);
-            opt.html(subname);
-           // opt.attr({'data-committee': subabbrev} );
-            select.append(opt);
-            select.val(opt.val());
-
-          }
-        })
-  } else {
-    select.hide();
-  }
+//  if (subcomms) {
+//    console.log('subcomms!!');
+////    committee = 'HSAG22';
+//
+//
+//    var subcommitteeRequest = $.ajax({
+//      dataType: "json",
+//      url: "https://congress.api.sunlightfoundation.com/committees",
+//      data: {
+//        per_page: "all",
+//        //chamber: "house",
+//        parent_committee_id: committee,
+//        subcommittee: true,
+//        apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
+//      }
+//    }).done(function(subcommittee){
+//
+//          select.show();
+//          var opt = $("<option></option>");
+//          console.log(subcommittee);
+//          if (true) select.empty(); // TODO: if parent_committee_id != last-selected committee
+//          for (var i = 0; i <subcommittee.results.length; i++) {
+//            console.log(subcommittee.results[i]);
+//            var subname = subcommittee.results[i].name;
+//            var subabbrev = subcommittee.results[i].committee_id;
+//            opt.val(subabbrev);
+//            console.log(subname);
+//            opt.html(subname);
+//           // opt.attr({'data-committee': subabbrev} );
+//            select.append(opt);
+//            select.val(opt.val());
+//
+//          }
+//        })
+//  } else {
+//    select.hide();
+//  }
   var committeeRequest = $.ajax({
     dataType: "json",
     url: "https://congress.api.sunlightfoundation.com/committees",
@@ -356,29 +357,204 @@ var drawMap= function (committee) {
 
 
 
+
 $("#subcomms").change(function() {
    subcomms = this.checked ? true : false;
+  var select = $("select");
+
+
   if (!subcomms) {
-    var select = $("select");
     select.hide();
+  } else {
+
+    console.log('subcomms!!');
+//    committee = 'HSAG22';
+
+
+    var subcommitteeRequest = $.ajax({
+      dataType: "json",
+      url: "https://congress.api.sunlightfoundation.com/committees",
+      data: {
+        per_page: "all",
+        //chamber: "house",
+        parent_committee_id: prev_committee,
+        subcommittee: true,
+        apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
+      }
+    }).done(function(subcommittee){
+
+          select.show();
+          var opt = $("<option></option>");
+          console.log(subcommittee);
+          if (true) select.empty(); // TODO: if parent_committee_id != last-selected committee
+          for (var i = 0; i <subcommittee.results.length; i++) {
+            console.log(subcommittee.results[i]);
+            var subname = subcommittee.results[i].name;
+            var subabbrev = subcommittee.results[i].committee_id;
+            opt.val(subabbrev);
+            console.log(subname);
+            opt.html(subname);
+            // opt.attr({'data-committee': subabbrev} );
+            select.append(opt);
+            select.val(opt.val());
+
+          }
+        })
   }
+//  if (subcomms) {
+////    console.log("subcomms")
+////    var select = $("select");
+////    select.show();
+////    var opt = $("<option></option>");
+////    opt.val("HSAG");
+////    opt.html("Option HSAG");
+////    select.append(opt);
+////    select.val(opt.val());
+//  } else {
+//    var select = $("select");
+//    select.empty();
+//    select.hide();
+//    console.log("no subcomms");
+//  }
 });
 
 $("#selectid").change(function(){
-  committee = $(this).val();
-  drawMap(committee);
+
+  drawMap(subcommittee);
 });
 
 
+//
+//$("[data-committee]").on("click", function(e) {
+//  if (subcomms) {console.log("you are HEREEEE")};
+//
+//  e.preventDefault();
+//  var committee = $(this).data("committee");
+//  drawMap(committee);
+//
+//});
+
+
+//$("#selectid").find("option:selected".change(function(e) {
+//  e.preventDefault();
+//console.log("HOOOOOOOOOO");
+////    var select = $("select");
+////    select.hide();
+//  }));
+
+
+
+//
+//$( "select" )
+//    .change(function() {
+//      var str = "";
+//      $( "select option:selected" ).each(function() {
+//        str += $( this ).text() + " ";
+//      });
+//      $( "div" ).text( str );
+//    })
+//    .trigger( "change" );
+
+//function change() {
+//  console.log("CHANGE")
+//}
+//$( "#selectid" )
+//    .change(function () {
+//      console.log('hahahaha')
+//      var str = "";
+//      $( "select option:selected" ).each(function() {
+//        console.log($(this).val());
+//        console.log($(this).attr("val"));
+//        drawMap($(this).attr("val"));
+//
+//      });
+//    });
+
+
+//$( "#selectid" )
+//    .change(function () {
+//      console.log('hahahaha')
+//      var str = "";
+//      $( "select option:selected" ).each(function() {
+//        console.log($(this).val());
+//        console.log($(this).attr("val"));
+//        drawMap($(this).attr("val"));
+//
+//      });
+//    });
+//    .change();
+//$( "select" )
+//    .change(function () {
+//      $( "select option:selected" ).change(function(e) {
+//        console.log('xxxxxxxxxx');
+//        console.log(e);
+//
+//        console.log($(this).val());
+//        console.log("option selected", $(this).attr("val"));
+//        drawMap($(this).attr("val"));
+//
+//      });
+//    });
+
+
+//$('select option').bind('change', function(){
+//  console.log('hi!');
+//});
+
+//$("select option").bind('change', function(e){
+//  console.log(e);
+//  console.log('""""""""""""""""""""""')
+//});
+
+//$("option").bind('change', function(e){
+//  e.stopPropagation();
+//  console.log(e);
+//  console.log('-----------------------------')
+//});
+
+
+
+//var la = $( "select.selectid option:selected").val();
+//console.log(la);
+
+
+//
+//$( "select" )
+//    .change(function () {
+//      var str = "";
+//      $( "select option:selected" ).each(function() {
+//        console.log($(this).val());
+//        console.log($(this).attr("val"));
+//
+//        str += $( this ).val() + " ";
+//      });
+//      $( "#trythis" ).text( str );
+//    })
+//    .change();
+
+
+//$('select option').bind('change', function(){
+//  console.log('hi!');
+//});
+
+//$( "select" )
+//    .change(function () {
+//      var str = "";
+//      $( "select option:selected" ).each(function() {
+//        console.log($(this).val());
+//        console.log($(this).attr("val"));
+//
+//        str += $( this ).val() + " ";
+//      });
+//      $( "div" ).text( str );
+//    })
+//    .change();
 
 $("[data-committee]").on("click", function(e) {
-  if (subcomms) {
-    console.log("you are HEREEEE")
-  }
-
   e.preventDefault();
   //console.log($(this));
   var committee = $(this).data("committee");
+  prev_committee = committee;
 //  console.log ('committee', committee);
 
   $(this).parent().parent()
