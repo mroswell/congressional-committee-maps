@@ -136,10 +136,8 @@
     <input id="subcomms" type="checkbox"/> Display Subcommittees
   </div>
   <select name="selectid" id="selectid" style="display:none;">
-    <option></option>
-  </select>
+    <option></option></select>
 </div>
-<div id="trythis"></div>
 <!-- End Nav -->
 
 <!-- Main Page Content and Sidebar -->
@@ -263,6 +261,10 @@ var drawMap= function (committee) {
 
           select.show();
           var opt = $("<option></option>");
+//          opt.val("HSAG");
+//          opt.html("Option HSAG");
+//          select.append(opt);
+//          select.val(opt.val());
           console.log(subcommittee);
           select.empty();
 
@@ -270,7 +272,7 @@ var drawMap= function (committee) {
             console.log("you are here.")
             console.log(subcommittee.results[i]);
             var subname = subcommittee.results[i].name;
-            var subabbrev = subcommittee.results[i].committee_id;
+            var subabbrev = subcommittee.results[1].committee_id;
             opt.val(subabbrev);
             console.log(subname);
             opt.html(subname);
@@ -381,14 +383,6 @@ $("#subcomms").change(function() {
 //    console.log("no subcomms");
 //  }
 });
-
-$("#selectid").change(function(){
-  committee = $(this).val();
-  drawMap(committee);
-
-});
-
-
 //
 //$("[data-committee]").on("click", function(e) {
 //  if (subcomms) {console.log("you are HEREEEE")};
@@ -400,14 +394,11 @@ $("#selectid").change(function(){
 //});
 
 
-//$("#selectid").find("option:selected".change(function(e) {
-//  e.preventDefault();
+//$("#selectid").find("option:selected".change(function() {
 //console.log("HOOOOOOOOOO");
 ////    var select = $("select");
 ////    select.hide();
 //  }));
-
-
 
 //
 //$( "select" )
@@ -471,53 +462,13 @@ $("#selectid").change(function(){
 //  console.log('""""""""""""""""""""""')
 //});
 
-//$("option").bind('change', function(e){
-//  e.stopPropagation();
-//  console.log(e);
-//  console.log('-----------------------------')
-//});
-
-
-
 //var la = $( "select.selectid option:selected").val();
 //console.log(la);
-
-
-//
-//$( "select" )
-//    .change(function () {
-//      var str = "";
-//      $( "select option:selected" ).each(function() {
-//        console.log($(this).val());
-//        console.log($(this).attr("val"));
-//
-//        str += $( this ).val() + " ";
-//      });
-//      $( "#trythis" ).text( str );
-//    })
-//    .change();
-
-
-//$('select option').bind('change', function(){
-//  console.log('hi!');
-//});
-
-//$( "select" )
-//    .change(function () {
-//      var str = "";
-//      $( "select option:selected" ).each(function() {
-//        console.log($(this).val());
-//        console.log($(this).attr("val"));
-//
-//        str += $( this ).val() + " ";
-//      });
-//      $( "div" ).text( str );
-//    })
-//    .change();
 
 $("[data-committee]").on("click", function(e) {
   if (subcomms) {
     console.log("you are HEREEEE")
+
   }
 
   e.preventDefault();
