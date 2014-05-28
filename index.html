@@ -83,7 +83,7 @@
     <h1 style="display:inline">Congressional Committee Maps</h1>
     <span class="rwd-line">
     <a href="#" style="margin-right:10px;margin-left:12px;" class="button committeeButton" data-dropdown="tinyDropHouse" data-options="is_hover:true">House Committees &raquo;</a>
-    <ul id="tinyDropHouse" class="f-dropdown" data-dropdown-content style="position: absolute; top: 230px; left: -99999px;">
+    <ul id="tinyDropHouse" class="f-dropdown" data-dropdown-content>
       <li><a href="#" data-committee="HSAG">House Committee on Agriculture</a></li>
       <li><a href="#" data-committee="HSAP">House Committee on Appropriations</a></li>
       <li><a href="#" data-committee="HSAS">House Committee on Armed Services</a></li>
@@ -105,11 +105,9 @@
       <li><a href="#" data-committee="HSVR">House Committee on Veterans' Affairs</a></li>
       <li><a href="#" data-committee="HSWM">House Committee on Ways and Means</a></li>
       <li><a href="#" data-committee="HLIG">House Permanent Select Committee on Intelligence</a></li>
-
     </ul>
     <a href="#" class="button committeeButton" data-dropdown="tinyDropSenate" data-options="is_hover:true">Senate Committees &raquo;</a>
-    <ul id="tinyDropSenate" class="f-dropdown" data-dropdown-content style="position: absolute; top: 230px; left: -99999px; max-width:470px; ">
-
+    <ul id="tinyDropSenate" class="f-dropdown" data-dropdown-content>
       <li><a href="#" data-committee="SSAF">Senate Committee on Agriculture, Nutrition, and Forestry</a></li>
       <li><a href="#" data-committee="SSAP">Senate Committee on Appropriations</a></li>
       <li><a href="#" data-committee="SSAS">Senate Committee on Armed Services</a></li>
@@ -133,11 +131,17 @@
       <li><a href="#" data-committee="SCNC">United States Senate Caucus on International Narcotics Control</a></li>
     </ul>
     </span>
-    <input id="subcomms" type="checkbox"/> Display Subcommittees
+    <input id="subcomms" type="checkbox"/>&nbsp;<span id="displaysubs">Display&nbsp;Subcommittees</span>
   </div>
-  <select name="selectid" id="selectid" style="display:none;">
-    <option></option>
-  </select>
+  <div class="row">
+  <div class="large-9 columns" role="content">
+
+  <p id="subcomm-message" style="display:none;">The <span id="subcomm-span">committee</span> has no subcommittees.</p>
+    <select name="subcommitteeList" id="subcommitteeList" style="display:none;">
+      <option></option>
+    </select>
+   </div>
+  </div>
 </div>
 <div id="trythis"></div>
 <!-- End Nav -->
@@ -195,6 +199,9 @@
 
 <script>
 // console.log(statesMap);
+var prev_committee = null;
+var prev_committee_name = null;
+var currentlySelectedCommittee;
 var subcomms = false;
 var sortedMemberNames;
 var latitude = 39.9;
@@ -239,48 +246,47 @@ congressLayer.addTo(map);
         }).addTo(map);
         //iadoid0h
 
+var getSubcommittees = function(committee){
+  var $select = $("#subcommitteeList");
+  var $subMessage = $('#subcomm-message');
+  $subMessage.hide();
+  $select.hide().empty();
+  if (subcomms) {
+   console.log('subcomms!!');
+   var subcommitteeRequest = $.ajax({
+     dataType: "json",
+     url: "https://congress.api.sunlightfoundation.com/committees",
+     data: {
+       per_page: "all",
+       parent_committee_id: committee,
+       subcommittee: true,
+       apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
+     }
+   }).done(function (subcommittee) {
+         console.log("SUBCOMMITTEE", subcommittee);
+         if (subcommittee.count > 0) {
+           $select.show();
+           var select = document.getElementById('subcommitteeList');
+           select.options.add(new Option("Please select a subcommittee...", ""));
+           for (var i = 0; i < subcommittee.results.length; i++) {
+             var subname = subcommittee.results[i].name;
+             var subabbrev = subcommittee.results[i].committee_id;
+             select.options.add(new Option(subname, subabbrev));
+           }
+         } else {
+           var $subcommSpan = $('#subcomm-span');
+           $subcommSpan.html(prev_committee_name);
+           $subMessage.show();
 
+         }
+       });
+  } else {
+    $select.hide();
+  }
+}
 var drawMap= function (committee) {
   console.log('subcomms!!!', subcomms);
-    var select = $("select");
 
-  if (subcomms) {
-    console.log('subcomms!!');
-//    committee = 'HSAG22';
-
-
-    var subcommitteeRequest = $.ajax({
-      dataType: "json",
-      url: "https://congress.api.sunlightfoundation.com/committees",
-      data: {
-        per_page: "all",
-        //chamber: "house",
-        parent_committee_id: committee,
-        subcommittee: true,
-        apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
-      }
-    }).done(function(subcommittee){
-
-          select.show();
-          var opt = $("<option></option>");
-          console.log(subcommittee);
-          if (true) select.empty(); // if parent_committee_id != last-selected committee
-          for (var i = 0; i <subcommittee.results.length; i++) {
-            console.log(subcommittee.results[i]);
-            var subname = subcommittee.results[i].name;
-            var subabbrev = subcommittee.results[i].committee_id;
-            opt.val(subabbrev);
-            console.log(subname);
-            opt.html(subname);
-           // opt.attr({'data-committee': subabbrev} );
-            select.append(opt);
-            select.val(opt.val());
-
-          }
-        })
-  } else {
-    select.hide();
-  }
   var committeeRequest = $.ajax({
     dataType: "json",
     url: "https://congress.api.sunlightfoundation.com/committees",
@@ -293,8 +299,10 @@ var drawMap= function (committee) {
       apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
     }
   }).done(function(committee){
-
+        console.log(committee)
         listMembers(committee);
+        currentlySelectedCommittee = _.clone(committee.results[0]);
+        delete currentlySelectedCommittee.members;
 
         var members = committee.results[0].members;
         var states = {};
@@ -354,38 +362,42 @@ var drawMap= function (committee) {
 
 };
 
-
-
 $("#subcomms").change(function() {
-   subcomms = this.checked ? true : false;
+  // console.log(committee)
+  subcomms = this.checked ? true : false;
+  var $select = $("#subcommitteeList");
   if (!subcomms) {
-    var select = $("select");
-    select.hide();
+    $select.hide();
+    drawMap(prev_committee);
+  } else {
+    if (prev_committee != null){
+      getSubcommittees(prev_committee);
+    }
   }
 });
 
-$("#selectid").change(function(){
-  committee = $(this).val();
-  drawMap(committee);
+$("#subcommitteeList").change(function(){
+  var subcommittee = $(this).val();
+  drawMap(subcommittee);
 });
 
 
 
-$("[data-committee]").on("click", function(e) {
-  if (subcomms) {
-    console.log("you are HEREEEE")
-  }
-
+$("[data-committee]").on("click", function (e) {
   e.preventDefault();
   //console.log($(this));
+  $("[data-committee]").removeClass('active');
+  $(this).addClass('active');
   var committee = $(this).data("committee");
-//  console.log ('committee', committee);
+  var name = $(this).html();
+  prev_committee = committee;
+  prev_committee_name = name;
+  getSubcommittees(committee);
 
   $(this).parent().parent()
       .css('left', '-99999px')
       .removeClass("open");
   drawMap(committee);
-
 });
 
 function colorDistrict(committee, chamber) {
@@ -460,15 +472,18 @@ function listMembers(committee) {
 
   sortedMemberNames = sortedArrayOfMemberChairs.concat(sortedArrayOfMemberNames);
 
-
+  var result = committee.results[0];
+  if(typeof result.url == 'undefined'){
+    result.url = currentlySelectedCommittee.url;
+  }
   var context = {
-    committee_abbrev: committee.results[0].committee_id,
-    committee_name: committee.results[0].name,
-    committee_results: committee.results[0],
-    committee_members: committee.results[0].members[0].legislator,
+    committee_abbrev: result.committee_id,
+    committee_name: result.name,
+    committee_results: result,
+    committee_members: result.members[0].legislator,
     sorted_members: sortedMemberNames,
-    first_name: committee.results[0].members[0].legislator.first_name,
-    title: committee.results[0].members[0].title
+    first_name: result.members[0].legislator.first_name,
+    title: result.members[0].title
   };
 
 
