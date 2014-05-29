@@ -79,7 +79,7 @@
   $(document).foundation();
 </script>
 <div class="row">
-  <div class="large-11 columns" style="margin-left:-15px;margin-top:15px;">
+  <div class="large-12 columns" style="margin-left:-15px;margin-top:15px;">
     <h1 style="display:inline">Congressional Committee Maps</h1>
     <span class="rwd-line">
     <a href="#" style="margin-right:10px;margin-left:12px;" class="button committeeButton" data-dropdown="tinyDropHouse" data-options="is_hover:true">House Committees &raquo;</a>
@@ -130,14 +130,14 @@
       <li><a href="#" data-committee="SPAG">Senate Special Committee on Aging</a></li>
       <li><a href="#" data-committee="SCNC">United States Senate Caucus on International Narcotics Control</a></li>
     </ul>
+    <div style="display:inline"><input id="subcomms" type="checkbox" style="display:inline" /><label for="subcomms" style="display:inline" id="displaysubs">&nbsp;Show&nbsp;Subcommittees</label></div>
+
     </span>
-    <input id="subcomms" type="checkbox"/>&nbsp;<span id="displaysubs">Display&nbsp;Subcommittees</span>
   </div>
   <div class="row">
   <div class="large-9 columns" role="content">
-
   <p id="subcomm-message" style="display:none;">The <span id="subcomm-span">committee</span> has no subcommittees.</p>
-    <select name="subcommitteeList" id="subcommitteeList" style="display:none;">
+    <select name="subcommitteeList" id="subcommitteeList" style="display:none;" class="select-style">
       <option></option>
     </select>
    </div>
