@@ -48,7 +48,7 @@
         {{/unless}}
         <br> {{office}} <br>{{phone}}
         <br /><a target="_blank" href="{{website}}">Website</a> &bull; <a target="_blank" href="{{contact_form}}">Contact Form</a>
-        <br /><a target="_blank" href="http://facebook.com/profile.php?id={{facebook_id}}">Facebook</a> &bull; <a href="http://twitter.com/{{twitter_id}}" target="_blank">Twitter</a> &bull; <a href="http://www.opensecrets.org/politicians/summary.php?cid={{crp_id}}" target="_blank">Open Secrets</a>
+        <br /><a target="_blank" href="http://facebook.com/profile.php?id={{facebook_id}}">Facebook</a> &bull; <a href="http://twitter.com/{{twitter_id}}" target="_blank">Twitter</a> &bull; <a href="http://www.opensecrets.org/politicians/summary.php?cid={{crp_id}}" target="_blank">Open Secrets</a> <!-- &bull; <a href="http://www.influenceexplorer.com/{{bioguide_id}}" target="_blank">Influence Explorer</a-->
       </p>
     </div>
     {{/each}}
@@ -130,7 +130,7 @@
       <li><a href="#" data-committee="SPAG">Senate Special Committee on Aging</a></li>
       <li><a href="#" data-committee="SCNC">United States Senate Caucus on International Narcotics Control</a></li>
     </ul>
-    <div style="display:inline"><input id="subcomms" type="checkbox" style="display:inline" /><label for="subcomms" style="display:inline" id="displaysubs">&nbsp;Show&nbsp;Subcommittees</label></div>
+    <div style="display:inline; white-space: nowrap;"><input id="subcomms" type="checkbox" style="display:inline" /><label for="subcomms" style="display:inline" id="displaysubs">&nbsp;Show&nbsp;Subcommittees</label></div>
 
     </span>
   </div>
@@ -252,7 +252,6 @@ var getSubcommittees = function(committee){
   $subMessage.hide();
   $select.hide().empty();
   if (subcomms) {
-   console.log('subcomms!!');
    var subcommitteeRequest = $.ajax({
      dataType: "json",
      url: "https://congress.api.sunlightfoundation.com/committees",
@@ -263,7 +262,6 @@ var getSubcommittees = function(committee){
        apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
      }
    }).done(function (subcommittee) {
-         console.log("SUBCOMMITTEE", subcommittee);
          if (subcommittee.count > 0) {
            $select.show();
            var select = document.getElementById('subcommitteeList');
@@ -285,8 +283,6 @@ var getSubcommittees = function(committee){
   }
 }
 var drawMap= function (committee) {
-  console.log('subcomms!!!', subcomms);
-
   var committeeRequest = $.ajax({
     dataType: "json",
     url: "https://congress.api.sunlightfoundation.com/committees",
@@ -299,7 +295,7 @@ var drawMap= function (committee) {
       apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
     }
   }).done(function(committee){
-        console.log(committee)
+//        console.log(committee)
         listMembers(committee);
         currentlySelectedCommittee = _.clone(committee.results[0]);
         delete currentlySelectedCommittee.members;
@@ -378,6 +374,7 @@ $("#subcomms").change(function() {
 
 $("#subcommitteeList").change(function(){
   var subcommittee = $(this).val();
+  queryString.push('subcommittee', subcommittee);
   drawMap(subcommittee);
 });
 
@@ -389,6 +386,8 @@ $("[data-committee]").on("click", function (e) {
   $("[data-committee]").removeClass('active');
   $(this).addClass('active');
   var committee = $(this).data("committee");
+  queryString.push('committee', committee);
+  queryString.push('subcommittee', null);
   var name = $(this).html();
   prev_committee = committee;
   prev_committee_name = name;
@@ -599,9 +598,7 @@ function resetHighlight(e) {
       color: '#ffffff'
     });
   }
-
 //  stateLayer.resetStyle(e.target);
-
 }
 
 var info = L.control();
@@ -641,8 +638,111 @@ function init() {
       .html();
   app.memberDetail = Handlebars.compile(source2);
   info.addTo(map);
+
+  var committee = getQueryVariable("committee");
+  var subcommittee = getQueryVariable("subcommittee");
+
+  if (committee) {
+    $('[data-committee="'+committee+'"]').click();
+  }
+  if (subcommittee) {
+    $('#subcomms').click();
+    setTimeout(function(){
+      $('#subcommitteeList>option[value="' + subcommittee + '"]').prop('selected', true);
+    },100)
+  }
 }
 
+
+//function setQueryVariable (variable, value) {
+//  window.location = '?' + variable + "=" + value;
+//}
+
+/*!
+ query-string
+ Parse and stringify URL query strings
+ https://github.com/sindresorhus/query-string
+ by Sindre Sorhus
+ MIT License
+ */
+(function () {
+  'use strict';
+  var queryString = {};
+
+  queryString.parse = function (str) {
+    if (typeof str !== 'string') {
+      return {};
+    }
+
+    str = str.trim().replace(/^\?/, '');
+
+    if (!str) {
+      return {};
+    }
+
+    return str.trim().split('&').reduce(function (ret, param) {
+      var parts = param.replace(/\+/g, ' ').split('=');
+      var key = parts[0];
+      var val = parts[1];
+
+      key = decodeURIComponent(key);
+      // missing `=` should be `null`:
+      // http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
+      val = val === undefined ? null : decodeURIComponent(val);
+
+      if (!ret.hasOwnProperty(key)) {
+        ret[key] = val;
+      } else if (Array.isArray(ret[key])) {
+        ret[key].push(val);
+      } else {
+        ret[key] = [ret[key], val];
+      }
+
+      return ret;
+    }, {});
+  };
+
+  queryString.stringify = function (obj) {
+    return obj ? Object.keys(obj).map(function (key) {
+      var val = obj[key];
+
+      if (Array.isArray(val)) {
+        return val.map(function (val2) {
+          return encodeURIComponent(key) + '=' + encodeURIComponent(val2);
+        }).join('&');
+      }
+
+      return encodeURIComponent(key) + '=' + encodeURIComponent(val);
+    }).join('&') : '';
+  };
+
+  queryString.push = function (key, new_value) {
+    var params = queryString.parse(location.search);
+    if(new_value == null){
+      delete params[key];
+    } else {
+      params[key] = new_value;
+    }
+    var new_params_string = queryString.stringify(params);
+    history.pushState({}, "", window.location.pathname + '?' + new_params_string);
+  }
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = queryString;
+  } else {
+    window.queryString = queryString;
+  }
+})();
+
+function getQueryVariable(variable) {
+  var query = window.location.search.substring(1);
+  var vars = query.split("&");
+  for (var i=0;i<vars.length;i++) {
+    var pair = vars[i].split("=");
+    if(pair[0] == variable){return pair[1];}
+  }
+  return(false);
+}
 init();
 
 </script>
