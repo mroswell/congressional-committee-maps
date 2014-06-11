@@ -266,9 +266,10 @@ var getSubcommittees = function(committee){
            $select.show();
            var select = document.getElementById('subcommitteeList');
            select.options.add(new Option("Please select a subcommittee...", ""));
-           for (var i = 0; i < subcommittee.results.length; i++) {
-             var subname = subcommittee.results[i].name;
-             var subabbrev = subcommittee.results[i].committee_id;
+           var sortedSubcommitteeNames = _(subcommittee.results).sortBy("name");
+           for (var i = 0; i < sortedSubcommitteeNames.length; i++) {
+             var subname = sortedSubcommitteeNames[i].name;
+             var subabbrev = sortedSubcommitteeNames[i].committee_id;
              select.options.add(new Option(subname, subabbrev));
            }
          } else {
@@ -295,7 +296,6 @@ var drawMap= function (committee) {
       apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
     }
   }).done(function(committee){
-//        console.log(committee)
         listMembers(committee);
         currentlySelectedCommittee = _.clone(committee.results[0]);
         delete currentlySelectedCommittee.members;
