@@ -29,7 +29,8 @@
   <script src="js/foundation/foundation.dropdown.js"></script>
   <script id="committee-member-template" type="text/x-handlebars-template">
     <div class="entry">
-      <a href="{{committee_results.url}}" target="_blank"><h6>{{ committee_name}} <i class="fa fa-link"></i></h6></a>
+      <a href="{{committee_results.url}}" target="_blank"><h6>{{#if parentcomm}}{{ parentcomm }}{{else}}{{committee_name}}{{/if}} <i class="fa fa-link"></i></h6></a>
+      {{#if parentcomm}}<div class="subcommitteeLabel">{{ committee_name }} Subcommittee</div>{{/if}}
       <ul>
         {{#each sorted_members}}
         <li><a href="javascript:void(0);" data-member-id="{{bioguide_id}}">
@@ -284,6 +285,7 @@ var getSubcommittees = function(committee){
   }
 }
 var drawMap= function (committee) {
+  console.log(committee);
   var committeeRequest = $.ajax({
     dataType: "json",
     url: "https://congress.api.sunlightfoundation.com/committees",
@@ -297,9 +299,12 @@ var drawMap= function (committee) {
     }
   }).done(function(committee){
         listMembers(committee);
-        currentlySelectedCommittee = _.clone(committee.results[0]);
-        delete currentlySelectedCommittee.members;
-
+        console.log("Committee results", committee.results[0]);
+        if(!committee.results[0].subcommittee){
+          currentlySelectedCommittee = _.clone(committee.results[0]);
+          console.log("currently", currentlySelectedCommittee);
+          delete currentlySelectedCommittee.members;
+        }
         var members = committee.results[0].members;
         var states = {};
         var districtName = {};
@@ -474,8 +479,13 @@ function listMembers(committee) {
   var result = committee.results[0];
   if(typeof result.url == 'undefined'){
     result.url = currentlySelectedCommittee.url;
+//    result.subcomm = true;
+    result.parentcomm = currentlySelectedCommittee.name;
+    console.log("currentlySelectedCommittee", currentlySelectedCommittee);
   }
   var context = {
+//    is_subcomm: result.subcomm,
+    parentcomm: result.parentcomm,
     committee_abbrev: result.committee_id,
     committee_name: result.name,
     committee_results: result,

@@ -141,3 +141,8 @@ h1 {font-size: 1.65em;}
 
 .panel {background-color: #f5f3f1;}
 /*#f1efeb;*/
+
+.subcommitteeLabel {
+    font-size: small;
+    margin-bottom: 5px;
+}
