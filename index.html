@@ -41,6 +41,7 @@
   <script id="committee-member-detail-template" type="text/x-handlebars-template">
   {{#each members}}
     <div class="entry entry-member-detail">
+    <img src="https://theunitedstates.io/images/congress/225x275/{{bioguide_id}}.jpg" alt="Photo of committee member">
       <p style="margin-bottom:0;"><strong>{{first_name}} {{last_name}} ({{party}}){{#if title}}, {{title}}{{/if}}</strong>
         <br />{{#unless district}}
         {{state_name}}
