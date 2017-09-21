@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+    <title>Congressional Committee Maps</title>
+    <script src="bower_components/jquery/jquery.js"></script>
+    <script src="bower_components/underscore/underscore.js"></script>
+    <script src="bower_components/handlebars/handlebars.min.js"></script>
+    <link href="bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.css" />
+    <!--[if lte IE 8]>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.ie.css" />
+    <![endif]-->
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.js"></script>
+
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/foundation.css" />
+
+    <!-- custom css -->
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- states, congressional districts, and helper functions-->
+    <script src="maps/statemap.js"></script>
+    <script src="maps/congress113map.js"></script>
+    <script src="js/helperFunctions.js"></script>
+
+    <script src="js/vendor/custom.modernizr.js"></script>
+    <script src="js/foundation/foundation.js"></script>
+    <script src="js/foundation/foundation.dropdown.js"></script>
+    <script id="committee-member-template" type="text/x-handlebars-template">
+        <div class="entry">
+            <a href="{{committee_results.url}}" target="_blank"><h6>{{#if parentcomm}}{{ parentcomm }}{{else}}{{committee_name}}{{/if}} <i class="fa fa-link"></i></h6></a>
+            {{#if parentcomm}}<div class="subcommitteeLabel">{{ committee_name }} Subcommittee</div>{{/if}}
+            <ul>
+                {{#each sorted_members}}
+                <li><a href="javascript:void(0);" data-member-id="{{bioguide_id}}">
+                    {{first_name}} {{last_name}} ({{party}}), {{stateAbbreviation}}{{#if district}}-{{district}}{{/if}}{{#if title}}, {{title}}{{/if}}</a></li>{{/each}}
+            </ul>
+        </div>
+    </script>
+    <script id="committee-member-detail-template" type="text/x-handlebars-template">
+        {{#each members}}
+        <div class="entry entry-member-detail">
+            <img src="https://theunitedstates.io/images/congress/225x275/{{bioguide_id}}.jpg" alt="Photo of committee member">
+            <p style="margin-bottom:0;"><strong>{{first_name}} {{last_name}} ({{party}}){{#if title}}, {{title}}{{/if}}</strong>
+                <br />{{#unless district}}
+                {{state_name}}
+                {{else}}
+                District {{stateAbbreviation}}-{{district}}
+                {{/unless}}
+                <br> {{office}} <br>{{phone}}
+                <br /><a target="_blank" href="{{website}}">Website</a> &bull; <a target="_blank" href="{{contact_form}}">Contact Form</a>
+                <br /><a target="_blank" href="http://facebook.com/profile.php?id={{facebook_id}}">Facebook</a> &bull; <a href="http://twitter.com/{{twitter_id}}" target="_blank">Twitter</a>
+                <br /><a href="http://www.opensecrets.org/politicians/summary.php?cid={{crp_id}}" target="_blank">Open&nbsp;Secrets</a> &bull; <a target ="_blank" href="https://projects.propublica.org/represent/members/{{bioguide_id}}">Represent</a>
+            </p>
+        </div>
+        {{/each}}
+    </script>
+
+    <script id="map-hover-template" type="text/x-handlebars-template">
+        {{#each members}}
+        <div class="map-hover">
+            <p><strong>{{first_name}} {{last_name}}</strong> ({{party}}, {{#unless district}}{{state_name}}{{else}}{{stateAbbreviation}}-{{district}}{{/unless}}){{#if title}}, {{title}}{{/if}}
+        </div>
+        {{/each}}
+    </script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-48161825-1', 'committeemaps.org');
+        ga('send', 'pageview');
+    </script>
+    <meta property="og:image" content="http://committeemaps.org/CommitteeMaps.org.png">
+
+</head>
+
+<body>
+<script>
+    $(document).foundation();
+</script>
+<div class="row">
+    <div class="large-12 columns" style="margin-left:-15px;margin-top:15px;">
+        <h1 style="display:inline">Congressional Committee Maps</h1>
+        <span class="rwd-line">
+    <a href="#" style="margin-right:10px;margin-left:12px;" class="button committeeButton" data-dropdown="tinyDropHouse" data-options="is_hover:true">House Committees &raquo;</a>
+    <ul id="tinyDropHouse" class="f-dropdown" data-dropdown-content>
+      <li><a href="#" data-committee="HSAG">House Committee on Agriculture</a></li>
+      <li><a href="#" data-committee="HSAP">House Committee on Appropriations</a></li>
+      <li><a href="#" data-committee="HSAS">House Committee on Armed Services</a></li>
+      <li><a href="#" data-committee="HSBU">House Committee on the Budget</a></li>
+      <li><a href="#" data-committee="HSED">House Committee on Education and the Workforce</a></li>
+      <li><a href="#" data-committee="HSIF">House Committee on Energy and Commerce</a></li>
+      <li><a href="#" data-committee="HSSO">House Committee on Ethics</a></li>
+      <li><a href="#" data-committee="HSBA">House Committee on Financial Services</a></li>
+      <li><a href="#" data-committee="HSFA">House Committee on Foreign Affairs</a></li>
+      <li><a href="#" data-committee="HSHA">House Committee on House Administration</a></li>
+      <li><a href="#" data-committee="HSHM">House Committee on Homeland Security</a></li>
+      <li><a href="#" data-committee="HSJU">House Committee on the Judiciary</a></li>
+      <li><a href="#" data-committee="HSII">House Committee on Natural Resources</a></li>
+      <li><a href="#" data-committee="HSGO">House Committee on Oversight and Government Reform</a></li>
+      <li><a href="#" data-committee="HSRU">House Committee on Rules</a></li>
+      <li><a href="#" data-committee="HSSM">House Committee on Small Business</a></li>
+      <li><a href="#" data-committee="HSSY">House Committee on Science, Space, and Technology</a></li>
+      <li><a href="#" data-committee="HSPW">House Committee on Transportation and Infrastructure</a></li>
+      <li><a href="#" data-committee="HSVR">House Committee on Veterans' Affairs</a></li>
+      <li><a href="#" data-committee="HSWM">House Committee on Ways and Means</a></li>
+      <li><a href="#" data-committee="HLIG">House Permanent Select Committee on Intelligence</a></li>
+    </ul>
+    <a href="#" class="button committeeButton" data-dropdown="tinyDropSenate" data-options="is_hover:true">Senate Committees &raquo;</a>
+    <ul id="tinyDropSenate" class="f-dropdown" data-dropdown-content>
+      <li><a href="#" data-committee="SSAF">Senate Committee on Agriculture, Nutrition, and Forestry</a></li>
+      <li><a href="#" data-committee="SSAP">Senate Committee on Appropriations</a></li>
+      <li><a href="#" data-committee="SSAS">Senate Committee on Armed Services</a></li>
+      <li><a href="#" data-committee="SSBK">Senate Committee on Banking, Housing, and Urban Affairs</a></li>
+      <li><a href="#" data-committee="SSBU">Senate Committee on the Budget</a></li>
+      <li><a href="#" data-committee="SSCM">Senate Committee on Commerce, Science, and Transportation</a></li>
+      <li><a href="#" data-committee="SSEG">Senate Committee on Energy and Natural Resources</a></li>
+      <li><a href="#" data-committee="SSEV">Senate Committee on Environment and Public Works</a></li>
+      <li><a href="#" data-committee="SSFI">Senate Committee on Finance</a></li>
+      <li><a href="#" data-committee="SSFR">Senate Committee on Foreign Relations</a></li>
+      <li><a href="#" data-committee="SSGA">Senate Committee on Homeland Security and Governmental Affairs</a></li>
+      <li><a href="#" data-committee="SSHR">Senate Committee on Health, Education, Labor, and Pensions</a></li>
+      <li><a href="#" data-committee="SLIA">Senate Committee on Indian Affairs</a></li>
+      <li><a href="#" data-committee="SSJU">Senate Committee on the Judiciary</a></li>
+      <li><a href="#" data-committee="SSRA">Senate Committee on Rules and Administration</a></li>
+      <li><a href="#" data-committee="SSSB">Senate Committee on Small Business and Entrepreneurship</a></li>
+      <li><a href="#" data-committee="SSVA">Senate Committee on Veterans' Affairs</a></li>
+      <li><a href="#" data-committee="SLET">Senate Select Committee on Ethics</a></li>
+      <li><a href="#" data-committee="SLIN">Senate Select Committee on Intelligence</a></li>
+      <li><a href="#" data-committee="SPAG">Senate Special Committee on Aging</a></li>
+      <li><a href="#" data-committee="SCNC">United States Senate Caucus on International Narcotics Control</a></li>
+    </ul>
+    <div style="display:inline; white-space: nowrap;"><input id="subcomms" type="checkbox" style="display:inline" /><label for="subcomms" style="display:inline" id="displaysubs">&nbsp;Show&nbsp;Subcommittees</label></div>
+
+    </span>
+    </div>
+    <div class="row">
+        <div class="large-9 columns" role="content">
+            <p id="subcomm-message" style="display:none;">The <span id="subcomm-span">committee</span> has no subcommittees.</p>
+            <select name="subcommitteeList" id="subcommitteeList" style="display:none;" class="select-style">
+                <option></option>
+            </select>
+        </div>
+    </div>
+</div>
+<div id="trythis"></div>
+<!-- End Nav -->
+
+<!-- Main Page Content and Sidebar -->
+<div class="row">
+
+    <!-- Main Content -->
+    <div class="large-9 columns" role="content">
+
+        <section>
+            <!--<div class="large-12 columns" style="margin-left:-30px;">-->
+
+            <!--</div>-->
+            <div class="row">
+                <div class="large-12 columns" id="map">
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- End Main Content -->
+
+
+
+    <aside class="large-3 columns" >
+        <div class="panel" id="member-detail">
+            <p>Select a committee, then click a committee member for detail.</p>
+        </div>
+        <div id="committee-list">
+        </div>
+    </aside>
+
+    <!-- End Sidebar -->
+</div>
+
+<!-- End Main Content and Sidebar -->
+
+
+<!-- Footer -->
+
+<footer class="row">
+    <div class="large-12 columns">
+        <hr />
+        <div class="row">
+            <div class="large-6 columns">
+                <p>Let me know if you use these maps: mroswell@gmail.com</p>
+            </div>
+            <div class="large-6 columns">
+                &nbsp;
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="js/startcode.js"></script>
+
+
+</body>
+</html>
