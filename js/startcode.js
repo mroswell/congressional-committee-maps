@@ -1,11 +1,3 @@
-var chamber = "";
-committeeID = 'HSAG';
-if (committeeID.charAt(0)=="H") {
-    chamber = "house"
-}else if (committeeID.charAt(0)=="S") {
-    chamber = "senate"
-}
-
 var prev_committee = null;
 var prev_committee_name = null;
 var currentlySelectedCommittee;
@@ -53,7 +45,50 @@ L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 var drawMap= function (committeeID) {
+    if (committeeID.charAt(0)=="H") {
+        chamber = "house"
+    }else if (committeeID.charAt(0)=="S") {
+        chamber = "senate"
+    }
     console.log("drawMap", committeeID);
+    var populateMemberDetail = function (members, i, committee, districtName, states) {
+        var member = members[i];
+        // console.log('member',member);
+        var dist = "";
+        // addLegislatorDetail(member.)
+        var membDetail = $.ajax({
+            dataType: "json",
+            headers: {'X-API-Key': "9ynWTXljOQ3Mw4vP7HMEN6ymaHxVydbh1jINFhxv"},
+            url: member.api_uri
+            // url: "https://api.propublica.org/congress/v1/members/{member-id}.json"
+        }).done(function (memberDetail) {
+            console.log("memberDetail", memberDetail);
+            console.log("****committee*****", committee);
+            member.detail = memberDetail;
+            dist = member.detail.results[0].roles[0].district;
+
+            console.log('dist', dist);
+            // console.log(dist);
+            if (member.chamber === "house") {
+                districtName = member.state + dist
+            } else {
+                districtName = member.state
+            }
+            // console.log('districtName', districtName);
+            listMembers(committee);
+
+        });
+
+        // console.log("member.district: ", member.district, "districtName: ", districtName)
+
+
+        if (!states[districtName]) {
+            states[districtName] = [member];
+        } else {
+            states[districtName].push(member);
+        }
+        return {member: member, districtName: districtName};
+    };
     $.ajax({
         dataType: "json",
         headers: {'X-API-Key': "9ynWTXljOQ3Mw4vP7HMEN6ymaHxVydbh1jINFhxv"},
@@ -61,51 +96,33 @@ var drawMap= function (committeeID) {
         // url: "https://api.propublica.org/congress/v1/115/house/committees/SSAF.json"
 
     }).done(function (committee) {
-        // listMembers(committee);
-        console.log("logging");
         console.log("Committee results", committee.results[0]);
-        listMembers(committee);
-        console.log("Committee results2", committee.results[0]);
         if(!committee.results[0].subcommittee){
             currentlySelectedCommittee = _.clone(committee.results[0]);
             console.log("currently", currentlySelectedCommittee);
             delete currentlySelectedCommittee.members;
         }
         var members = committee.results[0].current_members;
-        console.log("done1", members);
+        // console.log("done1", members);
         var states = {};
         var districtName = {};
         for (var i = 0; i < members.length; i++) {
-            var member = members[i];
-            var dist = "";
-            // addLegislatorDetail(member.)
-            var membDetail = $.ajax({
+            var __ret = populateMemberDetail(members, i, committee, districtName, states);
+            var member = __ret.member;
+            districtName = __ret.districtName;
+        }
+        var subcommittees = committee.results[0].subcommittees;
+        for (var i = 0; i <subcommittees.length; i++) {
+            console.log(subcommittees[i].api_uri);
+            $.ajax({
                 dataType: "json",
                 headers: {'X-API-Key': "9ynWTXljOQ3Mw4vP7HMEN6ymaHxVydbh1jINFhxv"},
-                url: member.api_uri
-                // url: "https://api.propublica.org/congress/v1/members/{member-id}.json"
-            }).done(function(memberDetail) {
-                console.log(memberDetail)
-                member["detail"] = memberDetail;
-                dist = member.detail.results[0].roles[0].district;
-                console.log(dist);
-                if (member.chamber==="house") {
-                    districtName = member.state + dist
-                } else {
-                    districtName = member.state
-                }
-                console.log(districtName);
-            });
+                url: subcommittees[i].api_uri
+            }).done(function (subcommittee) {
+                console.log("----subcommittee---", subcommittee);
+            })
 
-            // console.log("member.district: ", member.district, "districtName: ", districtName)
-
-
-            if (!states[districtName]) {
-                states[districtName] = [ member ];
-            } else {
-                states[districtName].push(member);
-            }
-        }
+        };
         if (member.chamber==="house") {
 
             stateLayer.setStyle({
@@ -206,6 +223,7 @@ $("#subcommitteeList").change(function(){
 
 
 $("[data-committee]").on("click", function (e) {
+    console.log("something*******")
     e.preventDefault();
     //console.log($(this));
     $("[data-committee]").removeClass('active');
@@ -274,7 +292,27 @@ var parties = _.map(committee, function(member){
         fillOpacity: 0.7
     };
 }
+
 function listMembers(committee) {
+    context = committee;
+    console.log('context', context);
+    var html = app.memberTemplate(context);
+    $('#committee-list')
+        .html(html);
+
+    var memberDetail;
+
+    $("[data-member-id]").on("click", function(e) {
+        var ID = $(this).data("member-id");
+        console.log("click", ID, committee);
+        // memberDetail = _.findWhere(sortedMemberNames, {bioguide_id: ID});
+       // memberDetailFunction(memberDetail);
+    });
+
+}
+
+
+function listMembersOrig(committee) {
 
     var arrayOfCommitteeChairs = [];
     var arrayOfCommitteeMembers = [];
