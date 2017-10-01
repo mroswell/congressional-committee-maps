@@ -33,25 +33,25 @@
             {{#if parentcomm}}<div class="subcommitteeLabel">{{ committee_name }} Subcommittee</div>{{/if}}
             <ul>
                 {{#each sorted_members}}
-                <li><a href="javascript:void(0);" data-member-id="{{bioguide_id}}">
-                    {{first_name}} {{last_name}} ({{party}}), {{stateAbbreviation}}{{#if district}}-{{district}}{{/if}}{{#if title}}, {{title}}{{/if}}</a></li>{{/each}}
+                <li><a href="javascript:void(0);" data-member-id="{{id}}">
+                    {{name}} ({{party}}), {{stateAbbreviation}}{{#if district}}-{{district}}{{/if}}{{#if isChair}}, Chair{{/if}}</a></li>{{/each}}
             </ul>
         </div>
     </script>
     <script id="committee-member-detail-template" type="text/x-handlebars-template">
         {{#each members}}
         <div class="entry entry-member-detail">
-            <img src="https://theunitedstates.io/images/congress/225x275/{{bioguide_id}}.jpg" alt="Photo of committee member">
-            <p style="margin-bottom:0;"><strong>{{first_name}} {{last_name}} ({{party}}){{#if title}}, {{title}}{{/if}}</strong>
+            <img src="https://theunitedstates.io/images/congress/225x275/{{id}}.jpg" alt="Photo of committee member">
+            <p style="margin-bottom:0;"><strong>{{name}} ({{party}}){{#if isChair}}, Chair{{/if}}</strong>
                 <br />{{#unless district}}
                 {{state_name}}
                 {{else}}
                 District {{stateAbbreviation}}-{{district}}
                 {{/unless}}
                 <br> {{office}} <br>{{phone}}
-                <br /><a target="_blank" href="{{website}}">Website</a> &bull; <a target="_blank" href="{{contact_form}}">Contact Form</a>
-                <br /><a target="_blank" href="http://facebook.com/profile.php?id={{facebook_id}}">Facebook</a> &bull; <a href="http://twitter.com/{{twitter_id}}" target="_blank">Twitter</a>
-                <br /><a href="http://www.opensecrets.org/politicians/summary.php?cid={{crp_id}}" target="_blank">Open&nbsp;Secrets</a> &bull; <a target ="_blank" href="https://projects.propublica.org/represent/members/{{bioguide_id}}">Represent</a>
+                <br /><a target="_blank" href="{{website}}">Website</a><!-- &bull; <a target="_blank" href="{{contact_form}}">Contact Form</a-->
+                <br /><a target="_blank" href="http://facebook.com/{{facebook_account}}">Facebook</a> &bull; <a href="http://twitter.com/{{twitter_account}}" target="_blank">Twitter</a>
+                <br /><a href="http://www.opensecrets.org/politicians/summary.php?cid={{crp_id}}" target="_blank">Open&nbsp;Secrets</a> &bull; <a target ="_blank" href="https://projects.propublica.org/represent/members/{{id}}">Represent</a>
             </p>
         </div>
         {{/each}}
@@ -60,7 +60,7 @@
     <script id="map-hover-template" type="text/x-handlebars-template">
         {{#each members}}
         <div class="map-hover">
-            <p><strong>{{first_name}} {{last_name}}</strong> ({{party}}, {{#unless district}}{{state_name}}{{else}}{{stateAbbreviation}}-{{district}}{{/unless}}){{#if title}}, {{title}}{{/if}}
+            <p><strong>{{name}}</strong> ({{party}}, {{#unless district}}{{state_name}}{{else}}{{stateAbbreviation}}-{{district}}{{/unless}}){{#if title}}, {{title}}{{/if}}
         </div>
         {{/each}}
     </script>

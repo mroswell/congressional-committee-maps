@@ -9,7 +9,7 @@ var latLng = new L.LatLng(latitude, longitude);
 var map = L.map('map').setView(latLng, 4);
 
 var stateLayer = L.geoJson(statesMap, {
-    onEachFeature:onEachFeature,
+    onEachFeature: onEachFeature,
     style: {
         fillColor: 'white',
         weight: 1,
@@ -24,7 +24,7 @@ stateLayer.addTo(map);
 
 var congressLayer = L.geoJson(congressionalDistricts,
     {
-        onEachFeature:onEachFeature,
+        onEachFeature: onEachFeature,
         style: {
             fillColor: 'white',
             weight: 1,
@@ -44,14 +44,14 @@ L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
     id: 'mroswell.i6hfjp09'
 }).addTo(map);
 
-var drawMap= function (committeeID) {
-    if (committeeID.charAt(0)=="H") {
+var drawMap = function (committeeID) {
+    if (committeeID.charAt(0) == "H") {
         chamber = "house"
-    }else if (committeeID.charAt(0)=="S") {
+    } else if (committeeID.charAt(0) == "S") {
         chamber = "senate"
     }
     console.log("drawMap", committeeID);
-    var populateMemberDetail = function (members, i, committee, districtName, states) {
+    var populateMemberDetail = function (members, i, committee, states, memberDetailsFetched) {
         var member = members[i];
         // console.log('member',member);
         var dist = "";
@@ -62,106 +62,114 @@ var drawMap= function (committeeID) {
             url: member.api_uri
             // url: "https://api.propublica.org/congress/v1/members/{member-id}.json"
         }).done(function (memberDetail) {
-            console.log("memberDetail", memberDetail);
-            console.log("****committee*****", committee);
+            // console.log("memberDetail", memberDetail);
+            // console.log("****committee*****", committee);
             member.detail = memberDetail;
             dist = member.detail.results[0].roles[0].district;
 
-            console.log('dist', dist);
+            if(dist == 'At-Large')
+                dist = '0';
+            // console.log('dist', dist);
             // console.log(dist);
-            if (member.chamber === "house") {
+            var districtName;
+            if (chamber === "house") {
                 districtName = member.state + dist
             } else {
                 districtName = member.state
             }
+
+            if (!states[districtName]) {
+                states[districtName] = [member];
+            } else {
+                states[districtName].push(member);
+            }
+
+
+            memberDetailsFetched.listIfDone();
             // console.log('districtName', districtName);
-            listMembers(committee);
+            //listMembers(committee);
 
         });
-
-        // console.log("member.district: ", member.district, "districtName: ", districtName)
-
-
-        if (!states[districtName]) {
-            states[districtName] = [member];
-        } else {
-            states[districtName].push(member);
-        }
-        return {member: member, districtName: districtName};
     };
+
+    var isSubcommittee = committeeID.length > 4;
+    var endpointUrl = isSubcommittee ?
+        "https://api.propublica.org/congress/v1/115/" + chamber + "/committees/" + committeeID.substring(0, 4) +
+        "/subcommittees/" + committeeID + ".json" :
+        "https://api.propublica.org/congress/v1/115/" + chamber + "/committees/" + committeeID + ".json";
     $.ajax({
         dataType: "json",
         headers: {'X-API-Key': "9ynWTXljOQ3Mw4vP7HMEN6ymaHxVydbh1jINFhxv"},
-        url: "https://api.propublica.org/congress/v1/115/" + chamber + "/committees/" + committeeID + ".json"
+        url: endpointUrl
         // url: "https://api.propublica.org/congress/v1/115/house/committees/SSAF.json"
 
     }).done(function (committee) {
-        console.log("Committee results", committee.results[0]);
-        if(!committee.results[0].subcommittee){
+        // console.log("Committee results", committee.results[0]);
+        if (!isSubcommittee) {
             currentlySelectedCommittee = _.clone(committee.results[0]);
-            console.log("currently", currentlySelectedCommittee);
-            delete currentlySelectedCommittee.members;
+            // console.log("currently", currentlySelectedCommittee);
+            //delete currentlySelectedCommittee.current_members;
         }
         var members = committee.results[0].current_members;
+        var memberDetailsFetched = {
+            number: 0, listIfDone: function () {
+                this.number++;
+                if (this.number === members.length) {
+                    assignColors();
+                    listMembers(committee);
+                }
+            }
+        };
         // console.log("done1", members);
         var states = {};
-        var districtName = {};
-        for (var i = 0; i < members.length; i++) {
-            var __ret = populateMemberDetail(members, i, committee, districtName, states);
-            var member = __ret.member;
-            districtName = __ret.districtName;
-        }
-        var subcommittees = committee.results[0].subcommittees;
-        for (var i = 0; i <subcommittees.length; i++) {
-            console.log(subcommittees[i].api_uri);
-            $.ajax({
-                dataType: "json",
-                headers: {'X-API-Key': "9ynWTXljOQ3Mw4vP7HMEN6ymaHxVydbh1jINFhxv"},
-                url: subcommittees[i].api_uri
-            }).done(function (subcommittee) {
-                console.log("----subcommittee---", subcommittee);
-            })
 
-        };
-        if (member.chamber==="house") {
-
-            stateLayer.setStyle({
-                fillColor: 'white',
-                weight: 1,
-                opacity: 0.41,
-                color: 'grey',
-                dashArray: '0',
-                fillOpacity: 0.7
-            });
-            congressLayer.setStyle(function(shape) {
+        var assignColors = function () {
+            if (chamber === "house") {
+                stateLayer.setStyle({
+                    fillColor: 'white',
+                    weight: 1,
+                    opacity: 0.41,
+                    color: 'grey',
+                    dashArray: '0',
+                    fillOpacity: 0.7
+                });
+                congressLayer.setStyle(function (shape) {
 //            var abbreviation = stateName2Abbrev[stateFips2Name[shape.properties.STATE]];
 //            var district = parseInt(shape.properties.CD, 10);  //04 GeoJSON; 4 Congress API
 //            var match = states[abbreviation+district];
-                var match = states[shape.properties.DISTRICT];
+                    var match = states[shape.properties.DISTRICT];
+                    // console.log('states', states);
+                    // console.log('MATCH', match);
 
-                return colorDistrict(match,'house');
-            });
+                    return colorDistrict(match, chamber);
+                });
 
-            congressLayer.bringToFront();
-        } else if (member.chamber==="senate") {
-            congressLayer.setStyle({
-                display: "none",
-                opacity: 0,
-                fillColor: "transparent"
-            });
+                congressLayer.bringToFront();
+            } else if (chamber === "senate") {
+                congressLayer.setStyle({
+                    display: "none",
+                    opacity: 0,
+                    fillColor: "transparent"
+                });
 
-            stateLayer.setStyle(function(shape) {
-                var match = states[shape.properties.STATE];
+                stateLayer.setStyle(function (shape) {
+                    var match = states[shape.properties.STATE];
 
 //            console.log('MATCH-SENATE', match);
-                return colorDistrict(match,'senate');
-            });
+                    return colorDistrict(match, chamber);
+                });
 
-            stateLayer.bringToFront();
+                stateLayer.bringToFront();
+            }
+        };
+
+        for (var i = 0; i < members.length; i++) {
+            populateMemberDetail(members, i, committee, states, memberDetailsFetched);
         }
+
     });
 };
-var getSubcommittees = function(committee){
+var getSubcommittees = function (committee) {
     var $select = $("#subcommitteeList");
     var $subMessage = $('#subcomm-message');
     $subMessage.hide();
@@ -197,10 +205,10 @@ var getSubcommittees = function(committee){
     } else {
         $select.hide();
     }
-}
+};
 
 
-$("#subcomms").change(function() {
+$("#subcomms").change(function () {
     // console.log(committee)
     subcomms = this.checked ? true : false;
     var $select = $("#subcommitteeList");
@@ -208,22 +216,20 @@ $("#subcomms").change(function() {
         $select.hide();
         drawMap(prev_committee);
     } else {
-        if (prev_committee != null){
+        if (prev_committee != null) {
             getSubcommittees(prev_committee);
         }
     }
 });
 
-$("#subcommitteeList").change(function(){
+$("#subcommitteeList").change(function () {
     var subcommittee = $(this).val();
     queryString.push('subcommittee', subcommittee);
     drawMap(subcommittee);
 });
 
 
-
 $("[data-committee]").on("click", function (e) {
-    console.log("something*******")
     e.preventDefault();
     //console.log($(this));
     $("[data-committee]").removeClass('active');
@@ -242,8 +248,8 @@ $("[data-committee]").on("click", function (e) {
     drawMap(committee);
 });
 
-function colorDistrict(committee, chamber) {
-    if (!committee) {
+function colorDistrict(districtMembers, chamber) {
+    if (!districtMembers) {
         if (chamber === "house") {
             return {
                 display: "none",
@@ -261,19 +267,18 @@ function colorDistrict(committee, chamber) {
             };
         }
     }
-        console.log(member.results[0].roles[0].party);
-        return member.results[0].roles[0].party;
+    //console.log(member.results[0].roles[0].party);
+//    return member.results[0].roles[0].party;
 
-var parties = _.map(committee, function(member){
-
-    return member.results[0].roles[0].party;
-});
+    var parties = _.map(districtMembers, function (member) {
+        return member.detail.results[0].roles[0].party;
+    });
     var hasDem = parties.indexOf("D") > -1;
     var hasRep = parties.indexOf("R") > -1;
     var hasInd = parties.indexOf("I") > -1;
 
     var color;
-    if ((hasDem && hasRep) || (hasDem && hasInd)|| (hasRep && hasInd)) {
+    if ((hasDem && hasRep) || (hasDem && hasInd) || (hasRep && hasInd)) {
         color = "#84207C";//"#86307A";//"purple";
     } else if (hasDem) {
         color = "blue";//"#0920d3";//"#1464C8";//"#2553A8";//"#0F2CB9";//"#0B22E3";//"#1B55B9";//"#1644C7";//"#2166AC";//"#4393C3";//"#2424FF"; //80% blue
@@ -293,53 +298,44 @@ var parties = _.map(committee, function(member){
     };
 }
 
+
 function listMembers(committee) {
-    context = committee;
-    console.log('context', context);
-    var html = app.memberTemplate(context);
-    $('#committee-list')
-        .html(html);
-
-    var memberDetail;
-
-    $("[data-member-id]").on("click", function(e) {
-        var ID = $(this).data("member-id");
-        console.log("click", ID, committee);
-        // memberDetail = _.findWhere(sortedMemberNames, {bioguide_id: ID});
-       // memberDetailFunction(memberDetail);
-    });
-
-}
-
-
-function listMembersOrig(committee) {
+    console.log("committee", committee);
 
     var arrayOfCommitteeChairs = [];
     var arrayOfCommitteeMembers = [];
 
-    _.each(committee.results[0].members, function (member) {
-        var memberObject = member.legislator;
-        memberObject.title = member.title;
-
-        if (memberObject.office != null) {
-            memberObject.office = memberObject.office.replace("Building", "Bldg.");
+    _.each(committee.results[0].current_members, function (member) {
+        var memberDetails = member.detail.results[0];
+        member.twitter_account = memberDetails.twitter_account;
+        member.facebook_account = memberDetails.facebook_account;
+        member.website = memberDetails.url;
+        member.crp_id = memberDetails.crp_id;
+        member_current_role = memberDetails.roles[0];
+        member.phone = member_current_role.phone;
+        member.office = member_current_role.office;
+        if (member.office != null) {
+            member.office = member.office.replace("Building", "Bldg.");
         }
-        memberObject.stateAbbreviation = memberObject.state;
+        member.stateAbbreviation = member.state;
+        member.district = member_current_role.district;
 
-        if (memberObject.title) {
-            arrayOfCommitteeChairs.push(memberObject);
+        if (member.id === committee.results[0].chair_id) {
+            member.isChair = true;
+            arrayOfCommitteeChairs.push(member);
         } else {
-            arrayOfCommitteeMembers.push(memberObject);
+            arrayOfCommitteeMembers.push(member);
         }
-
     });
     var sortedArrayOfMemberChairs = _(arrayOfCommitteeChairs).sortBy("title");
     var sortedArrayOfMemberNames = _(arrayOfCommitteeMembers).sortBy("last_name");
 
     sortedMemberNames = sortedArrayOfMemberChairs.concat(sortedArrayOfMemberNames);
 
+    console.log('sortedMemberNames', sortedMemberNames);
+
     var result = committee.results[0];
-    if(typeof result.url == 'undefined'){
+    if (typeof result.url == 'undefined') {
         result.url = currentlySelectedCommittee.url;
 //    result.subcomm = true;
         result.parentcomm = currentlySelectedCommittee.name;
@@ -354,25 +350,26 @@ function listMembersOrig(committee) {
         committee_members: result.current_members,
         sorted_members: sortedMemberNames,
         // first_name: result.current_members.legislator.first_name,
-        title: result.current_members[0].title
+        title: result.current_members[0].title,
+        twitter_account: result.current_members[0].twitter_account
     };
 
-
+    console.log(context)
     var html = app.memberTemplate(context);
     $('#committee-list')
         .html(html);
 
     var memberDetail;
 
-    $("[data-member-id]").on("click", function(e) {
+    $("[data-member-id]").on("click", function (e) {
         var ID = $(this).data("member-id");
-        memberDetail = _.findWhere(sortedMemberNames, {bioguide_id: ID});
+        memberDetail = _.findWhere(sortedMemberNames, {id: ID});
         memberDetailFunction(memberDetail);
     });
 
 }
 
-function memberDetailFunction(mDetail){
+function memberDetailFunction(mDetail) {
 
     var memberContext = {
         members: mDetail instanceof Array ? mDetail : [mDetail]
@@ -381,7 +378,7 @@ function memberDetailFunction(mDetail){
     // console.log("memberContext: ", memberContext);
     var htmlDetail = app.memberDetail(memberContext);
 //  var htmlDetail = templateDetail(memberContext);
-    if (memberContext.members.length>0) {
+    if (memberContext.members.length > 0) {
         // console.log("length > 1", memberContext.members.length);
         $('#member-detail').html(htmlDetail);
     } else {
@@ -409,7 +406,7 @@ function membersFromBoundary(boundary) {
                 }
 //      } else if (boundary.feature.properties.CD) {
             } else if (boundary.feature.properties.DISTRICT) {
-                if (boundary.feature.properties.DISTRICT ===sortedMemberNames[member].stateAbbreviation+sortedMemberNames[member].district) {
+                if (boundary.feature.properties.DISTRICT === sortedMemberNames[member].stateAbbreviation + sortedMemberNames[member].district) {
                     //  console.log("member", member);
                     members.push(sortedMemberNames[member]);
                 }
@@ -463,7 +460,7 @@ function resetHighlight(e) {
 
     // TODO: reset back to proper committee member party color
     //console.log('RESET Function');
-    if (color === "blue" || color === "red" || color === "#84207C" || color ==="#00B0A7") {
+    if (color === "blue" || color === "red" || color === "#84207C" || color === "#00B0A7") {
 
         layer.setStyle({
             weight: 1,
@@ -515,13 +512,13 @@ function init() {
     var subcommittee = getQueryVariable("subcommittee");
 
     if (committee) {
-        $('[data-committee="'+committee+'"]').click();
+        $('[data-committee="' + committee + '"]').click();
     }
     if (subcommittee) {
         $('#subcomms').click();
-        setTimeout(function(){
+        setTimeout(function () {
             $('#subcommitteeList>option[value="' + subcommittee + '"]').prop('selected', true);
-        },100)
+        }, 100)
     }
 }
 
@@ -590,14 +587,14 @@ function init() {
 
     queryString.push = function (key, new_value) {
         var params = queryString.parse(location.search);
-        if(new_value == null){
+        if (new_value == null) {
             delete params[key];
         } else {
             params[key] = new_value;
         }
         var new_params_string = queryString.stringify(params);
         history.pushState({}, "", window.location.pathname + '?' + new_params_string);
-    }
+    };
 
     if (typeof module !== 'undefined' && module.exports) {
         module.exports = queryString;
@@ -609,10 +606,12 @@ function init() {
 function getQueryVariable(variable) {
     var query = window.location.search.substring(1);
     var vars = query.split("&");
-    for (var i=0;i<vars.length;i++) {
+    for (var i = 0; i < vars.length; i++) {
         var pair = vars[i].split("=");
-        if(pair[0] == variable){return pair[1];}
+        if (pair[0] == variable) {
+            return pair[1];
+        }
     }
-    return(false);
+    return (false);
 }
 init();
