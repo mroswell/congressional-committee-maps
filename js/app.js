@@ -94,9 +94,9 @@ var drawMap = function (committeeID) {
 
     var isSubcommittee = committeeID.length > 4;
     var endpointUrl = isSubcommittee ?
-        "https://api.propublica.org/congress/v1/115/" + chamber + "/committees/" + committeeID.substring(0, 4) +
+        "https://api.propublica.org/congress/v1/117/" + chamber + "/committees/" + committeeID.substring(0, 4) +
         "/subcommittees/" + committeeID + ".json" :
-        "https://api.propublica.org/congress/v1/115/" + chamber + "/committees/" + committeeID + ".json";
+        "https://api.propublica.org/congress/v1/117/" + chamber + "/committees/" + committeeID + ".json";
     $.ajax({
         dataType: "json",
         headers: {'X-API-Key': "9ynWTXljOQ3Mw4vP7HMEN6ymaHxVydbh1jINFhxv"},
