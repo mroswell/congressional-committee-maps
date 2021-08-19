@@ -41,7 +41,11 @@
     <script id="committee-member-detail-template" type="text/x-handlebars-template">
         {{#each members}}
         <div class="entry entry-member-detail">
+          <picture>
+<!--            <source srcset="https://theunitedstates.io/images/congress/225x275/{{id}}.jpg">-->
+            <source srcset="https://www.congress.gov/img/member/{{toLowerCase id}}_200.jpg">
             <img src="https://theunitedstates.io/images/congress/225x275/{{id}}.jpg" alt="Photo of committee member">
+          </picture>
             <p style="margin-bottom:0;"><strong>{{name}} ({{party}}){{#if isChair}}, Chair{{/if}}</strong>
                 <br />{{#unless district}}
                 {{state_name}}
@@ -201,7 +205,11 @@
 </footer>
 
 <script src="js/app.js"></script>
-
+<script>
+Handlebars.registerHelper('toLowerCase', function(str) {
+return str.toLowerCase();
+});
+</script>
 
 </body>
 </html>

@@ -170,6 +170,7 @@ var drawMap = function (committeeID) {
     });
 };
 var getSubcommittees = function (committee) {
+    console.log(committee);
     var $select = $("#subcommitteeList");
     var $subMessage = $('#subcomm-message');
     $subMessage.hide();
@@ -177,13 +178,8 @@ var getSubcommittees = function (committee) {
     if (subcomms) {
         var subcommitteeRequest = $.ajax({
             dataType: "json",
-            url: "https://congress.api.sunlightfoundation.com/committees",
-            data: {
-                per_page: "all",
-                parent_committee_id: committee,
-                subcommittee: true,
-                apikey: "9e3e71730ae34e1ebbf4dd0e1c346c07"
-            }
+            headers: {'X-API-Key': "9ynWTXljOQ3Mw4vP7HMEN6ymaHxVydbh1jINFhxv"},
+            url: "https://api.propublica.org/congress/v1/117/" + chamber +"/committees/" + committee +".json"
         }).done(function (subcommittee) {
             if (subcommittee.count > 0) {
                 $select.show();
@@ -406,8 +402,11 @@ function membersFromBoundary(boundary) {
                 }
 //      } else if (boundary.feature.properties.CD) {
             } else if (boundary.feature.properties.DISTRICT) {
-                if (boundary.feature.properties.DISTRICT === sortedMemberNames[member].stateAbbreviation + sortedMemberNames[member].district) {
-                    //  console.log("member", member);
+                console.log(sortedMemberNames)
+                // if district is "At-Large", default to 0
+                var memberDistrict = (sortedMemberNames[member].district == "At-Large") ? 0 : sortedMemberNames[member].district;
+                if (boundary.feature.properties.DISTRICT === sortedMemberNames[member].stateAbbreviation + memberDistrict) {
+                    // if (boundary.feature.properties.DISTRICT === sortedMemberNames[member].stateAbbreviation + sortedMemberNames[member].district) {
                     members.push(sortedMemberNames[member]);
                 }
             }
@@ -419,6 +418,7 @@ function mapMemberDetail(e) {
     var boundary = e.target;
 
     var members = membersFromBoundary(boundary);
+    console.log("***", members);
     memberDetailFunction(members);
 }
 
